@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="RManager"
+ targetNamespace="urn:rm"
+ xmlns:tns="urn:rm"
+ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+ xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns1="urn:rm"
+ xmlns:SOAP="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:HTTP="http://schemas.xmlsoap.org/wsdl/http/"
+ xmlns:MIME="http://schemas.xmlsoap.org/wsdl/mime/"
+ xmlns:DIME="http://schemas.xmlsoap.org/ws/2002/04/dime/wsdl/"
+ xmlns:WSDL="http://schemas.xmlsoap.org/wsdl/"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+<types>
+
+ <schema targetNamespace="urn:rm"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="urn:rm"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+  <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <complexType name="key"><!-- ns1__key -->
+
+   <sequence>
+   </sequence>
+     <attribute name="keyid" type="xsd:anyURI" use="required"/><!-- ns1__key::keyid -->
+  </complexType>
+  <complexType name="query"><!-- ns1__query -->
+
+   <sequence>
+     <element name="key" type="ns1:key" minOccurs="0" maxOccurs="unbounded"/><!-- ns1__query::key -->
+   </sequence>
+     <attribute name="id" type="xsd:string" use="required"/><!-- ns1__query::id -->
+     <attribute name="num" type="xsd:int" use="required"/><!-- ns1__query::num -->
+  </complexType>
+  <complexType name="header"><!-- ns1__header -->
+
+   <sequence>
+     <element name="query" type="ns1:query" minOccurs="1" maxOccurs="1"/><!-- ns1__header::query -->
+   </sequence>
+  </complexType>
+ </schema>
+
+</types>
+
+<message name="queryRQ">
+ <part name="req" type="ns1:transport"/><!-- __ns1__queryRQ::req -->
+</message>
+
+<message name="transport">
+ <part name="header" type="ns1:header"/><!-- __ns1__queryRQ::header -->
+</message>
+
+<portType name="RManagerPortType">
+ <operation name="queryRQ">
+  <documentation>Service definition of function __ns1__queryRQ</documentation>
+  <input message="tns:queryRQ"/>
+  <output message="tns:transport"/>
+ </operation>
+</portType>
+
+<binding name="RManager" type="tns:RManagerPortType">
+ <SOAP:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+ <operation name="queryRQ">
+  <SOAP:operation style="rpc" soapAction=""/>
+  <input>
+     <SOAP:body use="encoded" namespace="urn:rm" encodingStyle="http://schems.xmlsoap.org/soap/encoding/"/>
+  </input>
+  <output>
+     <SOAP:body use="encoded" namespace="urn:rm" encodingStyle="http://schems.xmlsoap.org/soap/encoding/"/>
+  </output>
+ </operation>
+</binding>
+
+<service name="RManager">
+ <documentation>gSOAP 2.8.16 generated service definition</documentation>
+ <port name="RManager" binding="tns:RManager">
+  <SOAP:address location="https://localhost/cgi-bin/RManager.cgi"/>
+ </port>
+</service>
+
+</definitions>

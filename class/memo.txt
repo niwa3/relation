@@ -1,0 +1,9 @@
+プライバシ基準を数値で表す．
+とりあえず，0が最低で大きくなると匿名度が高くなる（データロスが大きくなる？）
+nodeid userid privacy_lvl node_type data_type data_frequency
+serviceid venderid privacy_lvl data_type data_frequency
+relationid nodeid serviceid anonymization_method privacy_lvl data_frequency
+匿名化方法は，とりあえずデフォルトにしとく，
+データ頻度はどのくらいの頻度でデータが取得できるか，ほしいか
+何秒間隔かを表せばいいのかな
+ノードがセンサーかアクチュエータかはノードタイプで記述しとく

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#"
+  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+  xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+  xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc"
+  xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+  xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+  xmlns:ns1="urn:rm">
+ <SOAP-ENV:Header>
+  <wsse:Security SOAP-ENV:actor="" SOAP-ENV:role="">
+   <wsu:Timestamp wsu:Id="">
+    <wsu:Created></wsu:Created>
+    <wsu:Expires></wsu:Expires>
+   </wsu:Timestamp>
+   <wsse:UsernameToken wsu:Id="">
+    <wsse:Username></wsse:Username>
+    <wsse:Password Type=""></wsse:Password>
+    <wsse:Nonce></wsse:Nonce>
+    <wsu:Created></wsu:Created>
+   </wsse:UsernameToken>
+   <wsse:BinarySecurityToken wsu:Id="" ValueType="" EncodingType=""></wsse:BinarySecurityToken>
+   <xenc:EncryptedKey Id="" Type="" MimeType="" Encoding="" Recipient="">
+    <xenc:EncryptionMethod Algorithm="">
+     <xenc:KeySize>0</xenc:KeySize>
+     <xenc:OAEPparams></xenc:OAEPparams>
+     <ds:DigestMethod Algorithm="">
+     </ds:DigestMethod>
+     <!-- extensibility element(s) -->
+
+    </xenc:EncryptionMethod>
+    <ds:KeyInfo Id="">
+     <ds:KeyName></ds:KeyName>
+     <ds:KeyValue>
+      <ds:DSAKeyValue>
+       <ds:G></ds:G>
+       <ds:Y></ds:Y>
+       <ds:J></ds:J>
+       <ds:P></ds:P>
+       <ds:Q></ds:Q>
+       <ds:Seed></ds:Seed>
+       <ds:PgenCounter></ds:PgenCounter>
+      </ds:DSAKeyValue>
+      <ds:RSAKeyValue>
+       <ds:Modulus></ds:Modulus>
+       <ds:Exponent></ds:Exponent>
+      </ds:RSAKeyValue>
+     </ds:KeyValue>
+     <ds:RetrievalMethod URI="" Type="">
+      <ds:Transforms>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+      </ds:Transforms>
+     </ds:RetrievalMethod>
+     <ds:X509Data>
+      <ds:X509IssuerSerial>
+       <ds:X509IssuerName></ds:X509IssuerName>
+       <ds:X509SerialNumber></ds:X509SerialNumber>
+      </ds:X509IssuerSerial>
+      <ds:X509SKI></ds:X509SKI>
+      <ds:X509SubjectName></ds:X509SubjectName>
+      <ds:X509Certificate></ds:X509Certificate>
+      <ds:X509CRL></ds:X509CRL>
+     </ds:X509Data>
+     <wsse:SecurityTokenReference wsu:Id="" wsc:Instance="" Usage="">
+      <wsse:Reference URI="" ValueType="">
+      </wsse:Reference>
+      <wsse:KeyIdentifier wsu:Id="" ValueType="" EncodingType=""></wsse:KeyIdentifier>
+      <wsse:Embedded wsu:Id="" ValueType="">
+      </wsse:Embedded>
+      <ds:X509Data>
+       <ds:X509IssuerSerial>
+        <ds:X509IssuerName></ds:X509IssuerName>
+        <ds:X509SerialNumber></ds:X509SerialNumber>
+       </ds:X509IssuerSerial>
+       <ds:X509SKI></ds:X509SKI>
+       <ds:X509SubjectName></ds:X509SubjectName>
+       <ds:X509Certificate></ds:X509Certificate>
+       <ds:X509CRL></ds:X509CRL>
+      </ds:X509Data>
+     </wsse:SecurityTokenReference>
+    </ds:KeyInfo>
+    <xenc:CipherData>
+     <xenc:CipherValue></xenc:CipherValue>
+     <xenc:CipherReference URI="">
+      <xenc:Transforms>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+      </xenc:Transforms>
+     </xenc:CipherReference>
+    </xenc:CipherData>
+    <xenc:EncryptionProperties Id="">
+     <xenc:EncryptionProperty Target="" Id="">
+     </xenc:EncryptionProperty>
+     <xenc:EncryptionProperty Target="" Id="">
+     </xenc:EncryptionProperty>
+    </xenc:EncryptionProperties>
+    <xenc:ReferenceList>
+
+      <xenc:DataReference URI="">
+      </xenc:DataReference>
+      <xenc:KeyReference URI="">
+      </xenc:KeyReference>
+     
+
+      <xenc:DataReference URI="">
+      </xenc:DataReference>
+      <xenc:KeyReference URI="">
+      </xenc:KeyReference>
+     
+    </xenc:ReferenceList>
+    <xenc:CarriedKeyName></xenc:CarriedKeyName>
+   </xenc:EncryptedKey>
+   <xenc:ReferenceList>
+
+     <xenc:DataReference URI="">
+     </xenc:DataReference>
+     <xenc:KeyReference URI="">
+     </xenc:KeyReference>
+    
+
+     <xenc:DataReference URI="">
+     </xenc:DataReference>
+     <xenc:KeyReference URI="">
+     </xenc:KeyReference>
+    
+   </xenc:ReferenceList>
+   <wsc:SecurityContextToken wsu:Id="">
+    <wsc:Identifier></wsc:Identifier>
+    <wsc:Instance></wsc:Instance>
+   </wsc:SecurityContextToken>
+   <ds:Signature Id="">
+    <ds:SignedInfo Id="">
+     <ds:CanonicalizationMethod Algorithm="">
+      <c14n:InclusiveNamespaces PrefixList="">
+      </c14n:InclusiveNamespaces>
+     </ds:CanonicalizationMethod>
+     <ds:SignatureMethod Algorithm="">
+      <ds:HMACOutputLength>0</ds:HMACOutputLength>
+     </ds:SignatureMethod>
+     <ds:Reference>
+      <ds:Transforms>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+      </ds:Transforms>
+      <ds:DigestMethod Algorithm="">
+      </ds:DigestMethod>
+      <ds:DigestValue></ds:DigestValue>
+     </ds:Reference>
+     <ds:Reference>
+      <ds:Transforms>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+      </ds:Transforms>
+      <ds:DigestMethod Algorithm="">
+      </ds:DigestMethod>
+      <ds:DigestValue></ds:DigestValue>
+     </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue></ds:SignatureValue>
+    <ds:KeyInfo Id="">
+     <ds:KeyName></ds:KeyName>
+     <ds:KeyValue>
+      <ds:DSAKeyValue>
+       <ds:G></ds:G>
+       <ds:Y></ds:Y>
+       <ds:J></ds:J>
+       <ds:P></ds:P>
+       <ds:Q></ds:Q>
+       <ds:Seed></ds:Seed>
+       <ds:PgenCounter></ds:PgenCounter>
+      </ds:DSAKeyValue>
+      <ds:RSAKeyValue>
+       <ds:Modulus></ds:Modulus>
+       <ds:Exponent></ds:Exponent>
+      </ds:RSAKeyValue>
+     </ds:KeyValue>
+     <ds:RetrievalMethod URI="" Type="">
+      <ds:Transforms>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+       <ds:Transform Algorithm="">
+        <c14n:InclusiveNamespaces PrefixList="">
+        </c14n:InclusiveNamespaces>
+        <!-- extensibility element(s) -->
+
+       </ds:Transform>
+      </ds:Transforms>
+     </ds:RetrievalMethod>
+     <ds:X509Data>
+      <ds:X509IssuerSerial>
+       <ds:X509IssuerName></ds:X509IssuerName>
+       <ds:X509SerialNumber></ds:X509SerialNumber>
+      </ds:X509IssuerSerial>
+      <ds:X509SKI></ds:X509SKI>
+      <ds:X509SubjectName></ds:X509SubjectName>
+      <ds:X509Certificate></ds:X509Certificate>
+      <ds:X509CRL></ds:X509CRL>
+     </ds:X509Data>
+     <wsse:SecurityTokenReference wsu:Id="" wsc:Instance="" Usage="">
+      <wsse:Reference URI="" ValueType="">
+      </wsse:Reference>
+      <wsse:KeyIdentifier wsu:Id="" ValueType="" EncodingType=""></wsse:KeyIdentifier>
+      <wsse:Embedded wsu:Id="" ValueType="">
+      </wsse:Embedded>
+      <ds:X509Data>
+       <ds:X509IssuerSerial>
+        <ds:X509IssuerName></ds:X509IssuerName>
+        <ds:X509SerialNumber></ds:X509SerialNumber>
+       </ds:X509IssuerSerial>
+       <ds:X509SKI></ds:X509SKI>
+       <ds:X509SubjectName></ds:X509SubjectName>
+       <ds:X509Certificate></ds:X509Certificate>
+       <ds:X509CRL></ds:X509CRL>
+      </ds:X509Data>
+     </wsse:SecurityTokenReference>
+    </ds:KeyInfo>
+   </ds:Signature>
+  </wsse:Security>
+ </SOAP-ENV:Header>
+ <SOAP-ENV:Body>
+  <ns1:data>
+   <ns1:req>
+    <ns1:transport>
+     <ns1:header ns1:massage="">
+     </ns1:header>
+     <ns1:body>
+      <ns1:relation ns1:relation-id="0" ns1:anonymous-method="" ns1:privacy-lvl="">
+       <ns1:node-id></ns1:node-id>
+       <ns1:node-id></ns1:node-id>
+       <ns1:service-id></ns1:service-id>
+       <ns1:service-id></ns1:service-id>
+      </ns1:relation>
+      <ns1:relation ns1:relation-id="0" ns1:anonymous-method="" ns1:privacy-lvl="">
+       <ns1:node-id></ns1:node-id>
+       <ns1:node-id></ns1:node-id>
+       <ns1:service-id></ns1:service-id>
+       <ns1:service-id></ns1:service-id>
+      </ns1:relation>
+     </ns1:body>
+    </ns1:transport>
+   </ns1:req>
+  </ns1:data>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

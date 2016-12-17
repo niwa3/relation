@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <schema targetNamespace="urn:rm"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="urn:rm"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="qualified">
+  <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <complexType name="relation"><!-- ns1__relation -->
+
+   <sequence>
+     <element name="node-id" type="xsd:anyURI" minOccurs="1" maxOccurs="unbounded"/><!-- ns1__relation::node_id -->
+     <element name="service-id" type="xsd:anyURI" minOccurs="1" maxOccurs="unbounded"/><!-- ns1__relation::service_id -->
+   </sequence>
+     <attribute name="relation-id" type="xsd:int" use="required"/><!-- ns1__relation::relation_id -->
+     <attribute name="anonymous-method" type="xsd:string" use="required"/><!-- ns1__relation::anonymous_method -->
+     <attribute name="privacy-lvl" type="xsd:string" use="required"/><!-- ns1__relation::privacy_lvl -->
+  </complexType>
+  <complexType name="body"><!-- ns1__body -->
+
+   <sequence>
+     <element name="relation" type="ns1:relation" minOccurs="0" maxOccurs="unbounded" nillable="true"/><!-- ns1__body::relation -->
+   </sequence>
+  </complexType>
+  <complexType name="header"><!-- ns1__header -->
+
+   <sequence>
+   </sequence>
+     <attribute name="massage" type="xsd:string" use="required"/><!-- ns1__header::massage -->
+  </complexType>
+  <complexType name="transport"><!-- ns1__transport -->
+
+   <sequence>
+     <element name="header" type="ns1:header" minOccurs="1" maxOccurs="1" nillable="true"/><!-- ns1__transport::header -->
+     <element name="body" type="ns1:body" minOccurs="1" maxOccurs="1" nillable="true"/><!-- ns1__transport::body -->
+   </sequence>
+  </complexType>
+  <complexType name="dataRQ"><!-- _ns1__dataRQ -->
+
+   <sequence>
+     <element name="transport" type="ns1:transport" minOccurs="1" maxOccurs="1" nillable="true"/><!-- _ns1__dataRQ::transport -->
+   </sequence>
+  </complexType>
+  <!-- operation request element -->
+  <element name="req" type="ns1:dataRQ"/>
+  <!-- operation response element -->
+  <element name="transport" type="ns1:transport"/>
+ </schema>
+
