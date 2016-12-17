@@ -100,4 +100,21 @@ class Relation{
     ~Relation();
 };
 
+struct ACK{
+  //public:
+  char request='\0';//n:newnode s:newservice c:chengerelation a:authentication d:delete
+  char nodeid[64]={'\0'};
+  char serviceid[64]={'\0'};
+  int lvl=0;
+  //public:
+  //ACK():nodeid({'\0'}),serviceid({'\0'}){
+  //  request=new char('\0');
+  //  lvl=new int(0);
+  //};
+  //~ACK(){
+  //  delete(request);
+  //  delete(lvl);
+  //};
+};
+
 #endif

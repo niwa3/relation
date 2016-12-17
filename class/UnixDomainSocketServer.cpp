@@ -1,12 +1,11 @@
 #include "UnixDomainSocketServer.h"
 
 std::string SOCK_NAME = "/tmp/unix-socket";
-std::string BASE_KEY = "Key";
 
-UnixDomainSocketServer::UnixDomainSocketServer(std::mutex *m, std::vector<std::string> *b) {
+UnixDomainSocketServer::UnixDomainSocketServer(std::mutex *m, std::vector<ACK> *b, int *s) {
   mtx=m;
   buffer=b;
-  ack_=new ACK;
+  req_success=s;
   UnixDomainSocketServer::socketName_=SOCK_NAME;
   mtx->lock();
   std::cout << "UnixDomainSocketServer" << std::this_thread::get_id() << std::endl;
@@ -15,7 +14,6 @@ UnixDomainSocketServer::UnixDomainSocketServer(std::mutex *m, std::vector<std::s
 }
 
 UnixDomainSocketServer::~UnixDomainSocketServer() {
-  delete(ack_);
 }
 
 void UnixDomainSocketServer::run() {
@@ -71,36 +69,45 @@ void UnixDomainSocketServer::serve() {
 void UnixDomainSocketServer::handle(int client) {
   bool success;
   if (getAck(client)) {
-      success = sendResponse(client);
+    while(*req_success){
+      std::this_thread::yield();
+    }
+    if(req_success==0){
+      std::cout<<"sendResponse"<<req_success<<std::endl;
+      success = sendResponse(client,0);
+      *req_success=1;
       if (success) {//ここらへんで応答の確認しないと完全性が失われそう
         notifyServer();
       }
+    }
+    else{
+      success = sendResponse(client,1);
+      *req_success=1;
+    }
   }
 }
 bool UnixDomainSocketServer::getAck(int client) {
-  recv(client, ack_->request, sizeof(ack_->request), 0);
-  recv(client, ack_->nodeid, sizeof(ack_->nodeid), 0);
-  recv(client, ack_->serviceid, sizeof(ack_->serviceid), 0);
-  recv(client, ack_->lvl, sizeof(ack_->lvl), 0);
+  recv(client, &res, sizeof(res), 0);
   mtx->lock();
-  std::cout<<"return ack_ ="<<ack_->request<<ack_->nodeid<<ack_->serviceid<<ack_->lvl<<std::endl;
+  std::cout<<"recv ="<<res.request<<" "<<res.nodeid<<" "<<res.serviceid<<" "<<res.lvl<<std::endl;
+  buffer->push_back(res);
   mtx->unlock();//<----here socket 受け渡し方
-  mtx->lock();
-  buffer->push_back(tmp);
-  mtx->unlock();
-  if (ack_)
+  //mtx->lock();
+  //buffer->push_back(tmp);
+  //mtx->unlock();
+  if (res.request)
     return true;
   else
     return false;
 }
 
-bool UnixDomainSocketServer::sendResponse(int client) {
+bool UnixDomainSocketServer::sendResponse(int client, int success) {
   int cc;
-  char sendBuf[16] = "ok";
+  //char sendBuf[16] = "ok";
   mtx->lock();
   std::cout<<"will send response"<<std::endl;
   mtx->unlock();
-  if ((cc = send(client, ack_, sizeof(ack_), 0)) < 0) {
+  if ((cc=send(client, &success, sizeof(success), 0))<0) {
     std::cerr<<"send";
     return false;
   } else {

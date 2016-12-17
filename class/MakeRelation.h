@@ -7,10 +7,12 @@
 #include <string>
 #include <mutex>
 #include "database.h"
+#include "type.h"
+#include "UnixDomainSocketServer.h"
 
 class MakeRelation{
   public:
-    MakeRelation(std::mutex*, std::vector<std::string>*);
+    MakeRelation(std::mutex*, std::vector<ACK>*);
     ~MakeRelation();
     void run();
     bool make_from_node(Node_ID);//
@@ -21,7 +23,7 @@ class MakeRelation{
 
   private:
     std::mutex *mtx;
-    std::vector<std::string> *buffer;
+    std::vector<ACK> *buffer;
     DataBase database;
 };
 

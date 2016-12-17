@@ -9,5 +9,6 @@
 #include "class/database.h"
 #include "class/type.h"
 #include "class/UnixDomainSocketServer.h"
+#include "class/MakeRelation.h"
 
 #endif

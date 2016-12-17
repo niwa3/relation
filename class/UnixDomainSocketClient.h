@@ -14,10 +14,12 @@
 #include <mutex>
 #include <fstream>
 #include <iostream>
+#include "type.h"
 
 class UnixDomainSocketClient{
   public:
-    UnixDomainSocketClient(int);
+    UnixDomainSocketClient();
+    //UnixDomainSocketClient(int):
     ~UnixDomainSocketClient();
     void run();
   private:
@@ -28,7 +30,7 @@ class UnixDomainSocketClient{
     void close_socket();
 
     int server_;
-    char ack_[100]={'\0'};
+    struct ACK ack_;
     std::string socket_name_;
     int name;
     int num;

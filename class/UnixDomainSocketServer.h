@@ -18,27 +18,11 @@
 #include <mutex>
 #include <vector>
 #include <atomic>
-
-class ACK{
-  public:
-  char *request;//n:newnode s:newservice c:chengerelation a:authentication
-  char nodeid[64];
-  char serviceid[64];
-  int *lvl;
-  public:
-  ACK(){
-    request=new char();
-    lvl=new int();
-  };
-  ~ACK(){
-    delete(request);
-    delete(lvl);
-  };
-};
+#include "type.h"
 
 class UnixDomainSocketServer{
   public:
-    UnixDomainSocketServer(std::mutex*, std::vector<std::string>*);
+    UnixDomainSocketServer(std::mutex*, std::vector<ACK>*, int*);
     ~UnixDomainSocketServer();
     void run();
 
@@ -49,14 +33,15 @@ class UnixDomainSocketServer{
     void handle(int);
     void notifyServer();
     bool getAck(int);
-    bool sendResponse(int);
+    bool sendResponse(int,int);
 
     int server_;
-    struct ACK *ack_;
+    struct ACK res;
     std::string socketName_;
     std::string basekey_;
     std::mutex *mtx;
-    std::vector<std::string> *buffer;
+    std::vector<ACK> *buffer;
+    int *req_success;
 };
 
 #endif
