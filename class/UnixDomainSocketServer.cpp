@@ -2,14 +2,11 @@
 
 std::string SOCK_NAME = "/tmp/unix-socket";
 
-UnixDomainSocketServer::UnixDomainSocketServer(std::mutex *m, std::vector<ACK> *b, int *s) {
-  mtx=m;
-  buffer=b;
-  req_success=s;
+UnixDomainSocketServer::UnixDomainSocketServer():make(&mtx,&buffer){
   UnixDomainSocketServer::socketName_=SOCK_NAME;
-  mtx->lock();
+  mtx.lock();
   std::cout << "UnixDomainSocketServer" << std::this_thread::get_id() << std::endl;
-  mtx->unlock();
+  mtx.unlock();
   unlink(socketName_.c_str());
 }
 
@@ -57,9 +54,9 @@ void UnixDomainSocketServer::serve() {
   struct sockaddr_in client_addr;
   socklen_t clientlen = sizeof(client_addr);
   while (1) {
-    mtx->lock();
+    mtx.lock();
     std::cout << "socket running" << std::endl;
-    mtx->unlock();
+    mtx.unlock();
     if ((client = accept(server_, (struct sockaddr *)&client_addr, &clientlen)) > 0)
       handle(client);
   }
@@ -68,45 +65,74 @@ void UnixDomainSocketServer::serve() {
 
 void UnixDomainSocketServer::handle(int client) {
   bool success;
-  if (getAck(client)) {
-    while(*req_success){
-      std::this_thread::yield();
+  char req;
+  if ((req=getReq(client, req))!='\0') {
+    switch(req){
+      case 'a':{
+        struct AUTH auth;
+        if(getAuth(client,auth)){
+          
+        };
+        break;
+               }
+      case 'n':
+      case 's':
+      case 'c':
+      case 'd':
+      default:
     }
-    if(req_success==0){
-      std::cout<<"sendResponse"<<req_success<<std::endl;
-      success = sendResponse(client,0);
-      *req_success=1;
-      if (success) {//ここらへんで応答の確認しないと完全性が失われそう
-        notifyServer();
-      }
+    std::cout<<"sendResponse"<<std::endl;
+    success = sendResponse(client,0);
+    if (success) {//ここらへんで応答の確認しないと完全性が失われそう
+      notifyServer();
     }
-    else{
-      success = sendResponse(client,1);
-      *req_success=1;
+  }else{
+    success = sendResponse(client,1);
+    if(success){
+      notifyServer();
     }
   }
 }
 bool UnixDomainSocketServer::getAck(int client) {
-  recv(client, &res, sizeof(res), 0);
-  mtx->lock();
-  std::cout<<"recv ="<<res.request<<" "<<res.nodeid<<" "<<res.serviceid<<" "<<res.lvl<<std::endl;
-  buffer->push_back(res);
-  mtx->unlock();//<----here socket 受け渡し方
-  //mtx->lock();
-  //buffer->push_back(tmp);
-  //mtx->unlock();
-  if (res.request)
+  int cc;
+  if((cc=recv(client, &res, sizeof(res), 0))<0)return false;
+  else{
+    mtx.lock();
+    std::cout<<"recv ="<<res.request<<" "<<res.nodeid<<" "<<res.serviceid<<" "<<res.lvl<<std::endl;
+    buffer.push_back(res);
+    mtx.unlock();//<----here socket 受け渡し方
+    //mtx.lock();
+    //buffer.push_back(tmp);
+    //mtx.unlock();
     return true;
-  else
-    return false;
+  }
 }
+
+bool UnixDomainSocketServer::getReq(int client,char &req){
+  int cc;
+  if((cc=recv(client, &req, sizeof(req), 0))>0){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+bool UnixDomainSocketServer::getAuth(int client, AUTH &auth){
+  int cc;
+  if((cc=recv(client, &auth, sizeof(auth), 0))>0){
+    return true;
+  }else{
+    return false;
+  }
+}
+
 
 bool UnixDomainSocketServer::sendResponse(int client, int success) {
   int cc;
   //char sendBuf[16] = "ok";
-  mtx->lock();
+  mtx.lock();
   std::cout<<"will send response"<<std::endl;
-  mtx->unlock();
+  mtx.unlock();
   if ((cc=send(client, &success, sizeof(success), 0))<0) {
     std::cerr<<"send";
     return false;

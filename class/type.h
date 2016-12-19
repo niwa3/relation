@@ -106,15 +106,11 @@ struct ACK{
   char nodeid[64]={'\0'};
   char serviceid[64]={'\0'};
   int lvl=0;
-  //public:
-  //ACK():nodeid({'\0'}),serviceid({'\0'}){
-  //  request=new char('\0');
-  //  lvl=new int(0);
-  //};
-  //~ACK(){
-  //  delete(request);
-  //  delete(lvl);
-  //};
+};
+
+struct AUTH{
+  char username[64]={'\0'};
+  char password[64]={'\0'};
 };
 
 #endif

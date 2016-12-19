@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include "type.h"
+#include "sha256.h"
 
 class DataBase{
   private:
@@ -19,15 +20,24 @@ class DataBase{
     int insertValue(Consumer c);
     int insertValue(Vender v);
     int insertValue(Relation r);
+
     int deleteValue(std::string kind, std::string id);
     int deleteRelation(Node_ID, Service_ID);
+
     int selectValue(std::string req, std::vector<Consumer> &c_res);
     int selectValue(std::string req, std::vector<Vender> &v_res);
     int selectValue(std::string req, std::vector<Relation> &r_res);
+
     int checkValue(Consumer c){};
     int checkValue(Vender v){};
     int checkValue(Relation r){};
+
     int updataRelationPrivacy(Node_ID, Service_ID, int);
+
+    bool authUser(std::string username,std::string password, std::string &userid);
+    bool authVender(std::string vendername,std::string password, std::string &venderid);
+    bool insertUser(std::string username, std::string password);
+
     std::string quote(std::string);
     ~DataBase();
 }; 

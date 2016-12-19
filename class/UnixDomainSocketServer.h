@@ -19,10 +19,11 @@
 #include <vector>
 #include <atomic>
 #include "type.h"
+#include "MakeRelation.h"
 
 class UnixDomainSocketServer{
   public:
-    UnixDomainSocketServer(std::mutex*, std::vector<ACK>*, int*);
+    UnixDomainSocketServer();
     ~UnixDomainSocketServer();
     void run();
 
@@ -33,15 +34,15 @@ class UnixDomainSocketServer{
     void handle(int);
     void notifyServer();
     bool getAck(int);
-    bool sendResponse(int,int);
-
+    bool getReq(int,char&);
+    bool getID(int);//Node_ID,Service_ID,User_ID,Vender_ID 
+    bool getAuth(int,AUTH&);
+    bool sendResponse(int,int); 
     int server_;
     struct ACK res;
     std::string socketName_;
-    std::string basekey_;
-    std::mutex *mtx;
-    std::vector<ACK> *buffer;
-    int *req_success;
+    std::mutex mtx;
+    std::vector<ACK> buffer;
+    MakeRelation make;
 };
-
 #endif

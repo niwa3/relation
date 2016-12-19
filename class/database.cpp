@@ -415,6 +415,88 @@ int DataBase::updataRelationPrivacy(Node_ID nodeid, Service_ID serviceid, int lv
   }
 }
 
+bool DataBase::authUser(std::string username,std::string password, std::string &userid){
+  try{
+    pqxx::result result=T.get()->exec("SELECT * FROM users WHERE username = " + T.get()->quote(username));
+    if(result.empty())return false;
+    else{
+      std::string salt;
+      pqxx::result::iterator itr=result.begin();
+      salt=itr["salt"].as<std::string>();
+      if(itr["password"].as<std::string>()==mysha256(salt+password)){
+        userid=itr["userid"].as<std::string>();
+        return true;
+      }else return false;
+    }
+  }
+  catch(const pqxx::sql_error& e){
+    std::cerr<<e.what()<<": SQL->"<<"select relationid from relation"<<std::endl;
+    return false;
+  }
+  catch(const pqxx::usage_error& e){
+    std::cerr<<e.what()<<std::endl;
+    return false;
+  }
+  catch(...){
+    std::cerr<<"err\n";
+    return false;
+  }
+}
+
+bool DataBase::authVender(std::string vendername,std::string password, std::string &venderid){
+  try{
+    pqxx::result result=T.get()->exec("SELECT * FROM venders WHERE vendername = " + T.get()->quote(vendername));
+    if(result.empty())return false;
+    else{
+      std::string salt;
+      pqxx::result::iterator itr=result.begin();
+      salt=itr["salt"].as<std::string>();
+      if(itr["password"].as<std::string>()==mysha256(salt+password)){
+        venderid=itr["venderid"].as<std::string>();
+        return true;
+      }else return false;
+    }
+  }
+  catch(const pqxx::sql_error& e){
+    std::cerr<<e.what()<<": SQL->"<<"select relationid from relation"<<std::endl;
+    return false;
+  }
+  catch(const pqxx::usage_error& e){
+    std::cerr<<e.what()<<std::endl;
+    return false;
+  }
+  catch(...){
+    std::cerr<<"err\n";
+    return false;
+  }
+}
+
+bool DataBase::insertUser(std::string username, std::string password){
+  try{
+    std::string salt;
+    salt="testsalt";
+    std::string hashedpass;
+    hashedpass=mysha256("testsalt"+password);
+    std::string userid="u00001";
+    T.get()->exec("INSERT INTO users "
+        "VALUES (" + T.get()->quote(username) +
+        ", " + T.get()->quote(hashedpass) +
+        ", " + T.get()->quote(salt) +
+        ", " + T.get()->quote(userid) + ")");
+    return true;
+  }
+  catch(const pqxx::sql_error& e){ std::cerr<<e.what()<<": SQL->"<<"select relationid from relation"<<std::endl;
+    return -1;
+  }
+  catch(const pqxx::usage_error& e){
+    std::cerr<<e.what()<<std::endl;
+    return -1;
+  }
+  catch(...){
+    std::cerr<<"err\n";
+  }
+}
+
 //==========================================
 
 
@@ -439,8 +521,8 @@ std::vector<std::string> split(const std::string &str, char sep){
   return v;
 }
 //===============================================
-//int main(){
-//  DataBase db("dbname=test user=testuser password=testpass");
+int main(){
+  DataBase db("dbname=test user=testuser password=testpass");
 //
 //  Consumer c[10];
 //  for(int i=0;i<10;i++){
@@ -516,6 +598,23 @@ std::vector<std::string> split(const std::string &str, char sep){
 //  //db.deleteRelation("'jklsdjl'=ANY(nodeid)");
 //  return 0;
 //
-//}
+  //db.insertUser("jhon","testpass");
+  std::string userid;
+  if(db.authUser("jhon","testpass",userid)){
+    std::cout<<userid<<std::endl;
+  }
+  else std::cerr<<"cant";
+  if(db.authUser("jhon","notpass",userid)){
+    std::cout<<userid<<std::endl;
+  }
+  else std::cerr<<"cant";
+  if(db.authUser("allry","testpass",userid)){
+    std::cout<<userid<<std::endl;
+  }
+  else std::cerr<<"cant";
+
+
+  return 0;
+}
 
 

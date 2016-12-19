@@ -8,45 +8,45 @@ MakeRelation::MakeRelation(std::mutex* m, std::vector<ACK>* b):database("dbname=
 
 MakeRelation::~MakeRelation(){}
 
-void MakeRelation::run(){
-  int req_success=1;
-  UnixDomainSocketServer socket(mtx,buffer,&req_success);
-  std::thread th(&UnixDomainSocketServer::run, socket);
-  std::vector<ACK>::iterator itr;
-  while(1){
-    while(buffer->empty()){
-      std::this_thread::yield;
-    }
-    mtx->lock();
-    itr=buffer->begin();
-    std::cout<<itr->request<<std::endl;
-    switch(itr->request){
-      case 'n':
-        if(make_from_node(itr->nodeid))req_success=0;
-        else req_success=2;
-        break;
-      case 's':
-        if(make_from_service(itr->serviceid))req_success=0;
-        else req_success=2;
-        break;
-      case 'c':
-        if(change_privacy_from_node(itr->nodeid,itr->serviceid,itr->lvl))req_success=0;
-        else req_success=2;
-        break;
-      case 'd':
-        if(delete_relation(itr->nodeid,itr->serviceid))req_success=0;
-        else req_success=2;
-        break;
-      default:
-        throw;
-        break;
-    }
-    mtx->unlock();
-  }
-  th.join();
-}
+//void MakeRelation::run(){
+//  int req_success=1;
+//  UnixDomainSocketServer socket(mtx,buffer,&req_success);
+//  std::thread th(&UnixDomainSocketServer::run, socket);
+//  std::vector<ACK>::iterator itr;
+//  while(1){
+//    while(buffer->empty()){
+//      std::this_thread::yield;
+//    }
+//    mtx->lock();
+//    itr=buffer->begin();
+//    std::cout<<itr->request<<std::endl;
+//    switch(itr->request){
+//      case 'n':
+//        if(make_from_node(itr->nodeid))req_success=0;
+//        else req_success=2;
+//        break;
+//      case 's':
+//        if(make_from_service(itr->serviceid))req_success=0;
+//        else req_success=2;
+//        break;
+//      case 'c':
+//        if(change_privacy_from_node(itr->nodeid,itr->serviceid,itr->lvl))req_success=0;
+//        else req_success=2;
+//        break;
+//      case 'd':
+//        if(delete_relation(itr->nodeid,itr->serviceid))req_success=0;
+//        else req_success=2;
+//        break;
+//      default:
+//        throw;
+//        break;
+//    }
+//    mtx->unlock();
+//  }
+//  th.join();
+//}
 
-bool MakeRelation::make_from_node(Node_ID newnodeid){
+bool MakeRelation::make_from_node(Consumer newnode){
   try{
     std::vector<Consumer> newnode;
     std::vector<Consumer>::iterator itr;
