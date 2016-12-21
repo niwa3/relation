@@ -46,104 +46,250 @@ void UnixDomainSocketServer::create() {
   }
   catch(...){
     unlink(socketName_.c_str());
+    closeSocket();
   }
 }
 
 void UnixDomainSocketServer::serve() {
-  int client;
-  struct sockaddr_in client_addr;
-  socklen_t clientlen = sizeof(client_addr);
-  while (1) {
-    mtx.lock();
-    std::cout << "socket running" << std::endl;
-    mtx.unlock();
-    if ((client = accept(server_, (struct sockaddr *)&client_addr, &clientlen)) > 0)
-      handle(client);
+  try{
+    int client;
+    struct sockaddr_in client_addr;
+    socklen_t clientlen = sizeof(client_addr);
+    while (1) {
+      mtx.lock();
+      std::cout << "socket running" << std::endl;
+      mtx.unlock();
+      if ((client = accept(server_, (struct sockaddr *)&client_addr, &clientlen)) > 0)
+        handle(client);
+    }
+    closeSocket();
   }
-  closeSocket();
+  catch(...){
+    unlink(socketName_.c_str());
+    closeSocket();
+  }
 }
 
 void UnixDomainSocketServer::handle(int client) {
-  bool success;
-  char req;
-  if ((req=getReq(client, req))!='\0') {
-    switch(req){
-      case 'a':{
-        struct AUTH auth;
-        if(getAuth(client,auth)){
-          
-        };
-        break;
-               }
-      case 'n':
-      case 's':
-      case 'c':
-      case 'd':
-      default:
-    }
-    std::cout<<"sendResponse"<<std::endl;
-    success = sendResponse(client,0);
-    if (success) {//ここらへんで応答の確認しないと完全性が失われそう
-      notifyServer();
-    }
-  }else{
-    success = sendResponse(client,1);
-    if(success){
-      notifyServer();
+  try{
+    bool success;
+    char req;
+    int res;
+    if ((getReq(client, req))!='\0') {
+      std::cout<<req<<std::endl;
+      switch(req){
+        case 'a':{
+          sendResponse(client, 0);
+          struct AUTH auth;
+          User_ID userid;
+          if(getAuth(client,auth)){
+            std::cout<<auth.username<<std::endl;
+            if(make.auth_user(auth.username,auth.password,userid)){
+              std::cout<<userid<<std::endl;
+              if(sendUserID(client, userid)){
+                recv(client,&res,sizeof(res),0);
+              }
+              else{
+                std::cout<<"cant send userid\n";
+                closeSocket();
+              }
+            }
+            else{
+              std::cout<<"authentication fail\n";
+              closeSocket();
+            }
+          }else{
+            closeSocket();
+            std::cerr<<"cant get username\n";
+          }
+          break;
+                 }
+        case 'n':{
+          sendResponse(client, 0);
+          std::string xml;
+          if(getXML(client, xml)){
+            Consumer c;
+            xmlparse.XML_node(xml,c);
+            std::cout<<c.getNode_ID()<<std::endl;
+            std::cout<<c.getUser_ID()<<std::endl;
+            std::cout<<c.getPrivacy_lvl()<<std::endl;
+            std::cout<<c.getNode_Type()<<std::endl;
+            std::cout<<c.getData_Type()<<std::endl;
+            std::cout<<c.getinterval()<<std::endl;
+            make.make_from_node(c,"u0001");
+          }
+          else{
+            closeSocket();
+          }
+          break;
+                 }
+        case 's':
+        case 'c':
+        case 'd':
+        default:{
+          break;
+                 }
+      }
+    }else{
+      closeSocket();
     }
   }
-}
-bool UnixDomainSocketServer::getAck(int client) {
-  int cc;
-  if((cc=recv(client, &res, sizeof(res), 0))<0)return false;
-  else{
-    mtx.lock();
-    std::cout<<"recv ="<<res.request<<" "<<res.nodeid<<" "<<res.serviceid<<" "<<res.lvl<<std::endl;
-    buffer.push_back(res);
-    mtx.unlock();//<----here socket 受け渡し方
-    //mtx.lock();
-    //buffer.push_back(tmp);
-    //mtx.unlock();
-    return true;
+  catch(...){
+      unlink(socketName_.c_str());
+      closeSocket();
   }
 }
 
 bool UnixDomainSocketServer::getReq(int client,char &req){
-  int cc;
-  if((cc=recv(client, &req, sizeof(req), 0))>0){
-    return true;
-  }else{
-    return false;
+  try{
+    int cc;
+    if((cc=recv(client, &req, sizeof(req), 0))>0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  catch(...){
+      unlink(socketName_.c_str());
+      closeSocket();
   }
 }
 
 bool UnixDomainSocketServer::getAuth(int client, AUTH &auth){
-  int cc;
-  if((cc=recv(client, &auth, sizeof(auth), 0))>0){
-    return true;
-  }else{
-    return false;
+  try{
+    int cc;
+    if((cc=recv(client, &auth, sizeof(auth), 0))>0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  catch(...){
+    unlink(socketName_.c_str());
+    closeSocket();
   }
 }
 
+bool UnixDomainSocketServer::getXML(int client, std::string &xml){
+  try{
+    int cc;
+    int size;
+    if((cc=recv(client, &size, sizeof(size), 0))<0){
+      sendResponse(client,1);
+      return false;
+    }
+    sendResponse(client,0);
+    char tmp[size];
+    if((cc=recv(client, &tmp, sizeof(tmp), 0))>0){
+      xml=tmp;
+      sendResponse(client,0);
+      return true;
+    }else{
+      return false;
+    }
+  }
+  catch(...){
+    unlink(socketName_.c_str());
+    closeSocket();
+  }
+}
 
-bool UnixDomainSocketServer::sendResponse(int client, int success) {
-  int cc;
-  //char sendBuf[16] = "ok";
-  mtx.lock();
-  std::cout<<"will send response"<<std::endl;
-  mtx.unlock();
-  if ((cc=send(client, &success, sizeof(success), 0))<0) {
-    std::cerr<<"send";
-    return false;
-  } else {
-    return true;
+bool UnixDomainSocketServer::sendResponse(int client, int res) {
+  try{
+    int cc;
+    //char sendBuf[16] = "ok";
+    mtx.lock();
+    std::cout<<"will send response"<<std::endl;
+    mtx.unlock();
+    if ((cc=send(client, &res, sizeof(res), 0))<0) {
+      std::cerr<<"send";
+      return false;
+    } else {
+      return true;
+    }
+  }
+  catch(...){
+    unlink(socketName_.c_str());
+    closeSocket();
+  }
+}
+
+bool UnixDomainSocketServer::sendUserID(int client, User_ID u){
+  try{
+    int cc;
+    mtx.lock();
+    std::cout<<"will send userid"<<std::endl;
+    mtx.unlock();
+    char userid[64]={'\0'};
+    strncpy(userid,u.c_str(),sizeof(userid));
+    if((cc=send(client, &userid, sizeof(userid), 0))<0){
+      std::cerr<<"send";
+      return false;
+    }else{
+      return true;
+    }
+  }
+  catch(...){
+    unlink(socketName_.c_str());
+    closeSocket();
+  }
+}
+
+bool UnixDomainSocketServer::sendXML(int client, std::string& xml){
+  try{
+    int cc;
+    int res;
+    mtx.lock();
+    std::cout<<"will send XML"<<std::endl;
+    mtx.unlock();
+    int size=xml.size();
+    char tmp[size];
+    strncpy(tmp,xml.c_str(),sizeof(tmp));
+    if((cc=send(client, &size, sizeof(size), 0))<0){
+      std::cerr<<"send size";
+      return false;
+    }else{
+      if((cc=recv(client, &res, sizeof(res), 0))<0){
+        std::cerr<<"response res";
+        return false;
+      }else{
+        if(res==0){
+          if((cc=send(client, &tmp, sizeof(tmp), 0))<0){
+            std::cerr<<"send tmp";
+            return false;
+          }else{
+            if((cc=recv(client, &res, sizeof(res), 0))<0){
+              std::cerr<<"response res2";
+              return false;
+            }else{
+              if(res!=0){
+                std::cerr<<"content err";
+                return false;
+              }
+            }
+          }
+        }else{
+          std::cerr<<"size err";
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+  catch(...){
+    unlink(socketName_.c_str());
+    closeSocket();
   }
 }
 
 void UnixDomainSocketServer::closeSocket() {
-  unlink(socketName_.c_str());
-}
+  unlink(socketName_.c_str()); }
 
 void UnixDomainSocketServer::notifyServer() {
+}
+
+int main(){
+  UnixDomainSocketServer server;
+  server.run();
+  return 0;
 }

@@ -521,8 +521,8 @@ std::vector<std::string> split(const std::string &str, char sep){
   return v;
 }
 //===============================================
-int main(){
-  DataBase db("dbname=test user=testuser password=testpass");
+//int main(){
+//  DataBase db("dbname=test user=testuser password=testpass");
 //
 //  Consumer c[10];
 //  for(int i=0;i<10;i++){
@@ -598,23 +598,23 @@ int main(){
 //  //db.deleteRelation("'jklsdjl'=ANY(nodeid)");
 //  return 0;
 //
-  //db.insertUser("jhon","testpass");
-  std::string userid;
-  if(db.authUser("jhon","testpass",userid)){
-    std::cout<<userid<<std::endl;
-  }
-  else std::cerr<<"cant";
-  if(db.authUser("jhon","notpass",userid)){
-    std::cout<<userid<<std::endl;
-  }
-  else std::cerr<<"cant";
-  if(db.authUser("allry","testpass",userid)){
-    std::cout<<userid<<std::endl;
-  }
-  else std::cerr<<"cant";
-
-
-  return 0;
-}
+//  db.insertUser("jhon","testpass");
+//  std::string userid;
+//  if(db.authUser("jhon","testpass",userid)){
+//    std::cout<<userid<<std::endl;
+//  }
+//  else std::cerr<<"cant";
+//  if(db.authUser("jhon","notpass",userid)){
+//    std::cout<<userid<<std::endl;
+//  }
+//  else std::cerr<<"cant";
+//  if(db.authUser("allry","testpass",userid)){
+//    std::cout<<userid<<std::endl;
+//  }
+//  else std::cerr<<"cant";
+//
+//
+//  return 0;
+//}
 
 
