@@ -32,23 +32,21 @@ class UnixDomainSocketServer{
   private:
     void create();
     void serve();
-    void closeSocket();
-    void handle(int);
+    void closeSocket(int&);
+    void handle(int&);
     void notifyServer();
-    bool getReq(int,char&);
-    bool getID(int);//Node_ID,Service_ID,User_ID,Vender_ID 
-    bool getAuth(int,AUTH&);
-    bool getXML(int, std::string&);
-    bool sendResponse(int,int);
-    bool sendUserID(int,User_ID);
-    bool sendXML(int, std::string&);
+    bool getReq(int&,char&);
+    bool getID(int&);//Node_ID,Service_ID,User_ID,Vender_ID 
+    bool getAuth(int&,AUTH&);
+    bool getXML(int&, std::string&);
+    bool sendResponse(int&,int);
+    bool sendUserID(int&,User_ID);
+    bool sendXML(int&, std::string&);
     int server_;
     struct ACK res;
     std::string socketName_;
     std::mutex mtx;
     std::vector<ACK> buffer;
     MakeRelation make;
-    xmlCreate xmlcreate;
-    xmlParse xmlparse;
 };
 #endif

@@ -78,6 +78,6 @@ class SOAP_CMAC RManagerService : public soap
 	///
 
 	/// Web service operation 'data' (returns error code or SOAP_OK)
-	virtual	int data(_ns1__dataRQ *req, _ns1__dataRS &res) SOAP_PURE_VIRTUAL;
+	virtual	int data(ns1__transport *req, ns1__transport &res) SOAP_PURE_VIRTUAL;
 };
 #endif

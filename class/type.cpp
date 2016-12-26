@@ -1,4 +1,6 @@
 //type.cpp
+#ifndef _MY_TYPE_CPP_
+#define _MY_TYPE_CPP_
 #include <iostream>
 #include "type.h"
 
@@ -14,7 +16,7 @@ Consumer::~Consumer(){
 }
 
 int Consumer::setUser_ID(User_ID id){
-  if(id.size()<=63 && id.size()>=0){
+  if(id.size()<=63){
     Consumer::user_id=id;
     return 0;
   }
@@ -22,7 +24,7 @@ int Consumer::setUser_ID(User_ID id){
 }
 
 int Consumer::setNode_ID(Node_ID id){
-  if(id.size()<=63 && id.size()>=0){
+  if(id.size()<=63){
     Consumer::node_id=id;
     return 0;
   }
@@ -127,7 +129,7 @@ int Consumer::getinterval(){
 
 //=============Vender=============
 int Vender::setVender_ID(Vender_ID id){
-  if(id.size()<=63 && id.size()>=0){
+  if(id.size()<=63){
     Vender::vender_id=id;
     return 0;
   }
@@ -135,7 +137,7 @@ int Vender::setVender_ID(Vender_ID id){
 }
 
 int Vender::setService_ID(Service_ID id){
-  if(id.size()<=63 && id.size()>=0){
+  if(id.size()<=63){
     Vender::service_id=id;
     return 0;
   }
@@ -305,6 +307,7 @@ Relation::Relation(){
 
 Relation::~Relation(){}
 
+#endif
 //===================================
 //int main(){
 //  try{

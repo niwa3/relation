@@ -186,7 +186,7 @@ int RManagerService::dispatch()
 
 static int serve_ns1__data(RManagerService *soap)
 {	struct ns1__data soap_tmp_ns1__data;
-	_ns1__dataRS res;
+	ns1__transport res;
 	res.soap_default(soap);
 	soap_default_ns1__data(soap, &soap_tmp_ns1__data);
 	if (!soap_get_ns1__data(soap, &soap_tmp_ns1__data, "ns1:data", NULL))
@@ -198,7 +198,7 @@ static int serve_ns1__data(RManagerService *soap)
 	soap->error = soap->data(soap_tmp_ns1__data.req, res);
 	if (soap->error)
 		return soap->error;
-	soap->encodingStyle = NULL;
+	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";
 	soap_serializeheader(soap);
 	res.soap_serialize(soap);
 	if (soap_begin_count(soap))
@@ -207,7 +207,7 @@ static int serve_ns1__data(RManagerService *soap)
 	{	if (soap_envelope_begin_out(soap)
 		 || soap_putheader(soap)
 		 || soap_body_begin_out(soap)
-		 || res.soap_put(soap, "ns1:dataRS", "")
+		 || res.soap_put(soap, "ns1:transport", "")
 		 || soap_body_end_out(soap)
 		 || soap_envelope_end_out(soap))
 			 return soap->error;
@@ -217,7 +217,7 @@ static int serve_ns1__data(RManagerService *soap)
 	 || soap_envelope_begin_out(soap)
 	 || soap_putheader(soap)
 	 || soap_body_begin_out(soap)
-	 || res.soap_put(soap, "ns1:dataRS", "")
+	 || res.soap_put(soap, "ns1:transport", "")
 	 || soap_body_end_out(soap)
 	 || soap_envelope_end_out(soap)
 	 || soap_end_send(soap))

@@ -1,4 +1,5 @@
-
+#ifndef _MY_DATABASE_CPP_
+#define _MY_DATABASE_CPP_
 #include "database.h"
 typedef std::string VALUEERR;
 
@@ -521,6 +522,9 @@ std::vector<std::string> split(const std::string &str, char sep){
   return v;
 }
 //===============================================
+
+
+#endif
 //int main(){
 //  DataBase db("dbname=test user=testuser password=testpass");
 //

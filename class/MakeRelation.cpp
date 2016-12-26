@@ -1,4 +1,6 @@
 //MakeRelation
+#ifndef _MAKE_RELATION_CPP_
+#define _MAKE_RELATION_CPP_
 #include "MakeRelation.h"
 //========MakeRelation========
 MakeRelation::MakeRelation(std::mutex* m, std::vector<ACK>* b){
@@ -24,7 +26,7 @@ bool MakeRelation::auth_user(std::string username, std::string password, std::st
   }
 }
 
-bool MakeRelation::make_from_node(Consumer newnode, User_ID id){
+bool MakeRelation::make_from_node(Consumer newnode){
   try{
     DataBase database(dbopt);
     std::vector<Vender> match_service;
@@ -40,6 +42,7 @@ bool MakeRelation::make_from_node(Consumer newnode, User_ID id){
     }
     database.selectValue("privacy_lvl >= " + std::to_string(newnode.getPrivacy_lvl()) + " AND data_type = " + database.quote(newnode.getData_Type()) + " AND interval >= " + std::to_string(newnode.getinterval()), match_service);
 
+    std::vector<Relation> rv;
     for(sitr=match_service.begin();sitr!=match_service.end();sitr++){
       std::cout<<"match_service:"<<sitr->getService_ID()<<std::endl;
       Relation tmp;
@@ -48,8 +51,11 @@ bool MakeRelation::make_from_node(Consumer newnode, User_ID id){
       tmp.setAnonymization("noise");
       tmp.setPrivacy_lvl(sitr->getPrivacy_lvl());
       tmp.setinterval(sitr->getinterval());
+      rv.push_back(tmp);
       if(database.insertValue(tmp))std::cout<<"exist\n";
     }
+    mySoapClient msclient;
+    msclient.sendRelation("https://10.0.0.2/cgi-bin/server.cgi",rv);
 
     return true;
   }
@@ -58,7 +64,7 @@ bool MakeRelation::make_from_node(Consumer newnode, User_ID id){
   }
 }
 
-bool MakeRelation::make_from_service(Vender newservice, Vender_ID id){
+bool MakeRelation::make_from_service(Vender newservice){
   try{
     DataBase database(dbopt);
     std::vector<Consumer> match_node;
@@ -115,6 +121,7 @@ bool MakeRelation::delete_relation(Node_ID nodeid, Service_ID serviceid, User_ID
   }
 }
 
+#endif
 //int main(){
 //  try{
 //  std::mutex *m=new std::mutex();

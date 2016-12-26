@@ -1,4 +1,6 @@
 //sha256.cpp
+#ifndef _MY_SHA256_
+#define _MY_SHA256_
 #include "sha256.h"
 std::string mysha256(std::string src){
   byte buffer[CryptoPP::SHA256::DIGESTSIZE];
@@ -11,3 +13,5 @@ std::string mysha256(std::string src){
   encoder.MessageEnd();
   return output;
 }
+
+#endif

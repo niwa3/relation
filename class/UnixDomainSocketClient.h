@@ -43,7 +43,6 @@ class UnixDomainSocketClient{
     std::string socket_name_;
     int name;
     int num;
-    xmlCreate xmlcreate;
     bool endflag;
     std::string userid;
 };

@@ -13,15 +13,51 @@ UnixDomainSocketClient::~UnixDomainSocketClient(){
 }
 
 void UnixDomainSocketClient::run(){
-  while(1){
+  try{
     create();
     std::cout<<"created"<<std::endl;
-    handle();
-    close_socket();
-    if(endflag){
-      endflag=false;
-      break;
+    bool flag=true;
+    do{
+      if(!send_req('a'))throw;
+      if(get_response()){
+        AUTH auth;
+        std::string tmp;
+        std::cout<<"username:";
+        std::cin>>std::setw(64)>>tmp;
+        strncpy(auth.username,tmp.c_str(),sizeof(auth.username));
+        std::cout<<"password:";
+        std::cin>>std::setw(64)>>tmp;
+        strncpy(auth.password,tmp.c_str(),sizeof(auth.password));
+        if(!send_auth(auth)){
+          std::cerr<<"cant sent auth\n";
+          throw;
+        }
+        else {
+          if(get_userid()){
+            std::cout<<"get userid\n";
+            flag=false;
+            send_response(0);
+          }else{
+            std::cerr<<"cant get userid\n";
+          }
+        }
+      }
+      else{
+        std::cerr<<"cant get response\n";
+        throw;
+      }
+    }while(flag);
+    while(1){
+      handle();
+      if(endflag){
+        endflag=false;
+        break;
+      }
     }
+    close(server_);
+  }
+  catch(...){
+    close(server_);
   }
 }
 
@@ -32,7 +68,6 @@ void UnixDomainSocketClient::close_socket(){
       throw;
     }
   }catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -54,7 +89,6 @@ void UnixDomainSocketClient::create(){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -63,17 +97,19 @@ void UnixDomainSocketClient::handle(){
   try{
     bool sent, success;
     char req;
+    std::cout<<"a:authentication\nn:newnode\ns:newservice\nc:chenge Privacy_lvl\nd:delete\nrequest:";
     std::cin>>req;
-    sent = send_req(req);
-    if(!sent)throw;
+    if(!send_req(req))throw;
     else{
       switch(req){
         case 'a':{
           if(get_response()){
             AUTH auth;
             std::string tmp;
+            std::cout<<"username:";
             std::cin>>std::setw(64)>>tmp;
             strncpy(auth.username,tmp.c_str(),sizeof(auth.username));
+            std::cout<<"password:";
             std::cin>>std::setw(64)>>tmp;
             strncpy(auth.password,tmp.c_str(),sizeof(auth.password));
             sent = send_auth(auth);
@@ -87,7 +123,6 @@ void UnixDomainSocketClient::handle(){
             throw;
           }
           else {
-            std::cout<<"get userid\n";
             if(get_userid()){
               send_response(0);
             }else{
@@ -101,6 +136,7 @@ void UnixDomainSocketClient::handle(){
           if(!userid.empty()){
             if(get_response()){
               Consumer c;
+              xmlCreate xmlcreate;
               std::string text;
               int num;
               std::cout<<"Node_ID:";
@@ -134,7 +170,6 @@ void UnixDomainSocketClient::handle(){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -153,7 +188,6 @@ bool UnixDomainSocketClient::send_ack(){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -161,7 +195,6 @@ bool UnixDomainSocketClient::send_ack(){
 bool UnixDomainSocketClient::send_req(char req){
   try{
     int ss;
-    std::cout<<"send request:"<<req<<std::endl;
     if((ss=send(server_, &req, sizeof(req), 0))<0){
       std::cerr<<"request\n";
       return false;
@@ -170,7 +203,6 @@ bool UnixDomainSocketClient::send_req(char req){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -187,7 +219,6 @@ bool UnixDomainSocketClient::send_auth(AUTH auth){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -234,7 +265,6 @@ bool UnixDomainSocketClient::send_XML(std::string xml){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -250,7 +280,6 @@ bool UnixDomainSocketClient::send_response(int res){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -274,7 +303,6 @@ bool UnixDomainSocketClient::get_XML(){
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -290,12 +318,10 @@ bool UnixDomainSocketClient::get_response(){
       throw;
     }
     else{
-      std::cout<<res<<std::endl;
       return true;
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }
@@ -308,16 +334,15 @@ bool UnixDomainSocketClient::get_userid(){
     if((gs=recv(server_, &userid_tmp, sizeof(userid_tmp),0))<0){
       std::cerr<<"read"<<std::endl;
       return false;
-      throw;
     }
     else{
       userid=userid_tmp;
-      std::cout<<userid<<std::endl;
+      if(userid.empty())return false;
+      std::cout<<"welcome:"<<userid<<std::endl;
       return true;
     }
   }
   catch(...){
-    unlink(socket_name_.c_str());
     close(server_);
   }
 }

@@ -110,7 +110,7 @@ char *RManagerProxy::soap_sprint_fault(char *buf, size_t len)
 }
 #endif
 
-int RManagerProxy::data(const char *endpoint, const char *soap_action, _ns1__dataRQ *req, _ns1__dataRS &res)
+int RManagerProxy::data(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res)
 {	struct soap *soap = this;
 	struct ns1__data soap_tmp_ns1__data;
 	if (endpoint)
@@ -120,7 +120,7 @@ int RManagerProxy::data(const char *endpoint, const char *soap_action, _ns1__dat
 	if (soap_action == NULL)
 		soap_action = "";
 	soap_begin(soap);
-	soap->encodingStyle = NULL;
+	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";
 	soap_tmp_ns1__data.req = req;
 	soap_serializeheader(soap);
 	soap_serialize_ns1__data(soap, &soap_tmp_ns1__data);
@@ -154,7 +154,9 @@ int RManagerProxy::data(const char *endpoint, const char *soap_action, _ns1__dat
 	 || soap_recv_header(soap)
 	 || soap_body_begin_in(soap))
 		return soap_closesock(soap);
-	res.soap_get(soap, "ns1:dataRS", "");
+	if (soap_recv_fault(soap, 1))
+		return soap->error;
+	res.soap_get(soap, "", "");
 	if (soap->error)
 		return soap_recv_fault(soap, 0);
 	if (soap_body_end_in(soap)
