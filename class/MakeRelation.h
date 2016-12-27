@@ -1,7 +1,7 @@
 //MakeRelation.h
 
-#ifndef _INCLUDED_MAKERELATION
-#define _INCLUDED_MAKERELATION
+#ifndef INCLUDED_MY_MAKERELATION
+#define INCLUDED_MY_MAKERELATION
 
 #include <iostream>
 #include <string>
@@ -9,7 +9,6 @@
 #include "database.h"
 #include "type.h"
 #include "../client/mySoapClient.h"
-
 
 class MakeRelation{
   public:

@@ -1,5 +1,5 @@
-#ifndef _MY_DATABASE_CPP_
-#define _MY_DATABASE_CPP_
+#ifndef MY_DATABASE_CPP
+#define MY_DATABASE_CPP
 #include "database.h"
 typedef std::string VALUEERR;
 
@@ -170,29 +170,6 @@ int DataBase::insertValue(Relation r){
     tmp=result.begin();
     r.setRelation_ID(tmp["gap"].as<int>());
 
-    //std::string strnode="{";
-    //std::vector<Node_ID> nodes=r.getNodes();
-    //int nodenum=0;
-    //for(std::vector<Node_ID>::iterator nodeit=nodes.begin();nodeit!=nodes.end();nodeit++){
-    //  strnode+=nodes[nodenum];
-    //  if(nodeit+1!=nodes.end())strnode+=",";
-    //  nodenum++;
-    //}
-    //strnode+="}";
-
-    //std::string strservice="{";
-    //std::vector<Service_ID> services=r.getServices();
-    //int servicenum=0;
-    //for(std::vector<Service_ID>::iterator serviceit=services.begin();serviceit!=services.end();serviceit++){
-    //  strservice+=serviceit[servicenum];
-    //  if(serviceit+1!=services.end())strservice+=",";
-    //  servicenum++;
-    //}
-    //strservice+="}";
-
-    //std::cout<<strnode<<strservice<<std::endl;
-
-
     T.get()->exec(
         "INSERT INTO relation "
         "VALUES (" + std::to_string(r.getRelation_ID()) + "," + T.get()->quote(r.getService_ID()) + "," + T.get()->quote(r.getNode_ID()) + "," + std::to_string(r.getPrivacy_lvl()) + "," + T.get()->quote(r.getAnonymization()) + "," + std::to_string(r.getinterval()) + ")");
@@ -357,21 +334,9 @@ int DataBase::selectValue(std::string req, std::vector<Relation> &r_res){
         "WHERE " + req);
     for(pqxx::result::iterator it=r.begin();it!=r.end();it++){
       Relation tmp;
-      //std::vector<Node_ID> nodes;
-      //std::vector<Service_ID> services;
       tmp.setRelation_ID(it["relationid"].as<int>());
-      //nodes=splitarray(it["nodeid"].as<std::string>());
       tmp.setNode_ID(it["nodeid"].as<std::string>());
-      //for(int i = 0;i!=nodes.size();i++){
-      //  tmp.addNodes(nodes[i]);
-      //  std::cout<<nodes[i]<<std::endl;
-      //}
-      //services=splitarray(it["serviceid"].as<std::string>());
       tmp.setService_ID(it["serviceid"].as<std::string>());
-      //for(int i = 0; i!=services.size();i++){
-      //  tmp.addServices(services[i]);
-      //  std::cout<<services[i]<<std::endl;
-      //}
       tmp.setAnonymization(it["anonymization_method"].as<std::string>());
       tmp.setPrivacy_lvl(it["privacy_lvl"].as<int>());
       tmp.setinterval(it["interval"].as<int>());

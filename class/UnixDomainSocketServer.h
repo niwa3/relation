@@ -1,5 +1,5 @@
-#ifndef _INCLUDE_UNIXDOMAINSOCKET_
-#define _INCLUDE_UNIXDOMAINSOCKET_
+#ifndef INCLUDE_UNIXDOMAINSOCKET
+#define INCLUDE_UNIXDOMAINSOCKET
 
 #include <limits>
 #include <sys/socket.h>

@@ -1,6 +1,6 @@
 //MakeRelation
-#ifndef _MAKE_RELATION_CPP_
-#define _MAKE_RELATION_CPP_
+#ifndef MAKE_RELATION_CPP
+#define MAKE_RELATION_CPP
 #include "MakeRelation.h"
 //========MakeRelation========
 MakeRelation::MakeRelation(std::mutex* m, std::vector<ACK>* b){
@@ -51,11 +51,11 @@ bool MakeRelation::make_from_node(Consumer newnode){
       tmp.setAnonymization("noise");
       tmp.setPrivacy_lvl(sitr->getPrivacy_lvl());
       tmp.setinterval(sitr->getinterval());
-      rv.push_back(tmp);
       if(database.insertValue(tmp))std::cout<<"exist\n";
+      database.selectValue("nodeid = " + database.quote(newnode.getNode_ID()) + " AND serviceid = " + database.quote(sitr->getService_ID()), rv);
     }
     mySoapClient msclient;
-    msclient.sendRelation("https://10.0.0.2/cgi-bin/server.cgi",rv);
+    msclient.sendRelation("10.24.129.39:12345",rv);
 
     return true;
   }

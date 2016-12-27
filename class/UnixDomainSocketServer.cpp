@@ -1,5 +1,5 @@
-#ifndef _UNIX_DOMAIN_SOCKET_SERVER_CPP_
-#define _UNIX_DOMAIN_SOCKET_SERVER_CPP_
+#ifndef UNIX_DOMAIN_SOCKET_SERVER_CPP
+#define UNIX_DOMAIN_SOCKET_SERVER_CPP
 #include "UnixDomainSocketServer.h"
 
 const std::string SOCK_NAME = "/tmp/unix-socket";
@@ -140,7 +140,7 @@ void UnixDomainSocketServer::handle(int& client) {
                  }
       }
     }else{
-      closeSocket(client);
+      //closeSocket(client);
     }
   }
   catch(...){

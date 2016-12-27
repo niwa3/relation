@@ -1,6 +1,6 @@
 //type.cpp
-#ifndef _MY_TYPE_CPP_
-#define _MY_TYPE_CPP_
+#ifndef MY_TYPE_CPP
+#define MY_TYPE_CPP
 #include <iostream>
 #include "type.h"
 
