@@ -14,7 +14,6 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <netdb.h>
-#include <signal.h>
 #include <mutex>
 #include <vector>
 #include <atomic>
@@ -34,10 +33,10 @@ class UnixDomainSocketServer{
     void serve();
     void closeSocket(int&);
     void handle(int&);
-    void notifyServer();
-    bool getReq(int&,char&);
-    bool getID(int&);//Node_ID,Service_ID,User_ID,Vender_ID 
-    bool getAuth(int&,AUTH&);
+    //void notifyServer();
+    //bool getReq(int&,char&);
+    //bool getID(int&);//Node_ID,Service_ID,User_ID,Vender_ID 
+    //bool getAuth(int&,AUTH&);
     bool getXML(int&, std::string&);
     bool sendResponse(int&,int);
     bool sendUserID(int&,User_ID);

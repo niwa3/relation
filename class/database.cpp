@@ -35,8 +35,12 @@ int DataBase::insertValue(Consumer c){
       VALUEERR err = "no datatype.";
       throw err;
     }
-    else if(c.getinterval()==0){
+    else if(c.getinterval()<0){
       VALUEERR err = "interval";
+      throw err;
+    }
+    else if(c.getlocation().empty()){
+      VALUEERR err = "no location";
       throw err;
     }
     pqxx::result result=T.get()->exec(
@@ -51,7 +55,7 @@ int DataBase::insertValue(Consumer c){
     else{
       T.get()->exec(
           "INSERT INTO node "
-          "VALUES (" + T.get()->quote(c.getNode_ID()) + "," + T.get()->quote(c.getUser_ID()) + "," + T.get()->quote(c.getPrivacy_lvl()) + "," +T.get()->quote(c.getNode_Type()) + "," + T.get()->quote(c.getData_Type()) + "," + std::to_string(c.getinterval()) + ");");
+          "VALUES (" + T.get()->quote(c.getNode_ID()) + "," + T.get()->quote(c.getUser_ID()) + "," + T.get()->quote(c.getPrivacy_lvl()) + "," +T.get()->quote(c.getNode_Type()) + "," + T.get()->quote(c.getData_Type()) + "," + std::to_string(c.getinterval()) + "," + T.get()->quote(c.getlocation()) + ");");
       return 0;
     }
   }
@@ -143,7 +147,7 @@ int DataBase::insertValue(Relation r){
       VALUEERR err = "no service.";
       throw err;
     }
-    else if(r.getinterval()==0){
+    else if(r.getinterval()<0){
       VALUEERR err = "interval";
       throw err;
     }
@@ -490,51 +494,66 @@ std::vector<std::string> split(const std::string &str, char sep){
 
 
 #endif
-//int main(){
-//  DataBase db("dbname=test user=testuser password=testpass");
-//
-//  Consumer c[10];
-//  for(int i=0;i<10;i++){
-//  c[i].setNode_ID("http://GW/sensor"+std::to_string(i));
-//  c[i].setUser_ID("jhon");
-//  if(i%3==0)  c[i].setPrivacy_lvl(1);
-//  else if(i%3==1) c[i].setPrivacy_lvl(2);
-//  else c[i].setPrivacy_lvl(3);
-//  //if(i%2==0) c[i].setNode_Type("sensor");
-//  //else c[i].setNode_Type("actuator");
-//  c[i].setNode_Type("sensor");
-//  if(i%2==0) c[i].setData_Type("power");
-//  else c[i].setData_Type("temp");
-//  c[i].setinterval((i+1)*60);
-//  db.deleteValue("node",c[i].getNode_ID());
-//  db.insertValue(c[i]);
-//  }
+int main(){
+  DataBase db("dbname=test user=testuser password=testpass");
+  Consumer c[10];
+  for(int i=0;i<10;i++){
+  c[i].setNode_ID("http://GW/sensor"+std::to_string(i));
+  c[i].setUser_ID("jhon");
+  if(i%3==0)  c[i].setPrivacy_lvl(1);
+  else if(i%3==1) c[i].setPrivacy_lvl(2);
+  else c[i].setPrivacy_lvl(3);
+  //if(i%2==0) c[i].setNode_Type("sensor");
+  //else c[i].setNode_Type("actuator");
+  c[i].setNode_Type("sensor");
+  if(i%2==0) c[i].setData_Type("power");
+  else c[i].setData_Type("temp");
+  c[i].setinterval((i+1)*60);
+  c[i].setlocation("http://10.24.129.39");
+  db.deleteValue("node",c[i].getNode_ID());
+  db.insertValue(c[i]);
+  }
 //  std::vector<Consumer> res;
 //  db.selectValue("privacy_lvl >= 2",res);
 //
 //  for(std::vector<Consumer>::iterator it=res.begin();it!=res.end();it++){
 //    std::cout<<it->getNode_ID()<<it->getUser_ID()<<it->getPrivacy_lvl()<<it->getNode_Type()<<it->getData_Type()<<it->getinterval()<<std::endl;
 //  }
-//
-//  Vender v[10];
-//  for(int i=0;i<10;i++){
-//    v[i].setService_ID("http://service/dummy"+std::to_string(i));
-//    v[i].setVender_ID("WWW Co.");
-//    if(i%3==0) v[i].setPrivacy_lvl(3);
-//    else if(i%3==1) v[i].setPrivacy_lvl(2);
-//    else v[i].setPrivacy_lvl(1);
-//    if(i%2==0) v[i].setData_Type("temp");
-//    else v[i].setData_Type("power");
-//    v[i].setinterval((i+1)*60);
-//    db.deleteValue("service",v[i].getService_ID());
-//    db.insertValue(v[i]);
+
+//  for(int i=0;i<100;i++){
+//    Vender v;
+//    if(i<30){
+//      v.setVender_ID("v00001");
+//      v.setService_ID("http://service1/dummy"+std::to_string(i));
+//      v.setinterval((i+1)*30);
+//    }
+//    else if(i<60){
+//      v.setVender_ID("v00002");
+//      v.setService_ID("http://service2/dummy"+std::to_string(i-30));
+//      v.setinterval((i-29)*30);
+//    }
+//    else{
+//      v.setVender_ID("v00003");
+//      v.setService_ID("http://service3/dummy"+std::to_string(i-60));
+//      v.setinterval((i-59)*30);
+//    }
+//    if(i%3==0) v.setPrivacy_lvl(3);
+//    else if(i%3==1) v.setPrivacy_lvl(2);
+//    else v.setPrivacy_lvl(1);
+//    if(i%4==0) v.setData_Type("temp");
+//    else if(i%4==1) v.setData_Type("CO2");
+//    else if(i%4==2) v.setData_Type("wind");
+//    else v.setData_Type("power");
+//    //db.deleteValue("service",v.getService_ID());
+//    db.insertValue(v);
+//    std::cout<<i<<std::endl;
 //  }
 //  std::vector<Vender> vres;
 //  db.selectValue("privacy_lvl > 1",vres);
-//for(std::vector<Vender>::iterator it=vres.begin();it!=vres.end();it++){
+//  for(std::vector<Vender>::iterator it=vres.begin();it!=vres.end();it++){
 //    std::cout<<it->getService_ID()<<it->getVender_ID()<<it->getPrivacy_lvl()<<it->getData_Type()<<it->getinterval()<<std::endl;
 //  }
-//
+
 //  Relation r;
 //  r.setNode_ID("http://GW/sensor2");
 //  r.setService_ID("http://service/dummy1");
@@ -583,7 +602,7 @@ std::vector<std::string> split(const std::string &str, char sep){
 //  else std::cerr<<"cant";
 //
 //
-//  return 0;
-//}
+  return 0;
+}
 
 

@@ -55,7 +55,7 @@ bool MakeRelation::make_from_node(Consumer newnode){
       database.selectValue("nodeid = " + database.quote(newnode.getNode_ID()) + " AND serviceid = " + database.quote(sitr->getService_ID()), rv);
     }
     mySoapClient msclient;
-    msclient.sendRelation("10.24.129.39:12345",rv);
+    msclient.sendRelation("https://10.24.129.39:12345",rv);
 
     return true;
   }

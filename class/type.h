@@ -27,6 +27,7 @@ class Consumer{
     Node_Type node_type;
     Data_Type data_type;
     int interval;
+    std::string location;
 
   public:
     int setUser_ID(User_ID);
@@ -35,12 +36,14 @@ class Consumer{
     int setNode_Type(std::string);
     int setData_Type(std::string);
     int setinterval(int);
+    int setlocation(std::string);
     User_ID getUser_ID();
     Node_ID getNode_ID();
     Privacy getPrivacy_lvl();
     std::string getNode_Type();
     std::string getData_Type();
     int getinterval();
+    std::string getlocation();
     Consumer();
     ~Consumer();
 };
@@ -73,8 +76,6 @@ class Relation{
     enum class Anonymization_Method{ NONE, DELETE, NOISE, CHENGE} method;
     Privacy privacy_lvl;
     Relation_ID relation_id;
-    //std::vector<Service_ID> services;
-    //std::vector<Node_ID> nodes;
     Service_ID service_id;
     Node_ID node_id;
     int interval;
@@ -83,16 +84,12 @@ class Relation{
     int setRelation_ID(Relation_ID id);
     int setAnonymization(std::string an);
     int setPrivacy_lvl(int);
-    //int addServices(Service_ID id);
-    //int addNodes(Node_ID id);
     int setService_ID(Service_ID id);
     int setNode_ID(Node_ID);
     int setinterval(int);
     Relation_ID getRelation_ID();
     std::string getAnonymization();
     Privacy getPrivacy_lvl();
-    //std::vector<Service_ID> getServices();
-    //std::vector<Node_ID> getNodes();
     Service_ID getService_ID();
     Node_ID getNode_ID();
     int getinterval();

@@ -32,11 +32,6 @@ int Consumer::setNode_ID(Node_ID id){
 }
 
 int Consumer::setPrivacy_lvl(int lv){
-//  if(dp=="high") Consumer::privacy_lvl=Privacy::HIGH;
-//  else if(dp=="mid") Consumer::privacy_lvl=Privacy::MID;
-//  else if(dp=="low") Consumer::privacy_lvl=Privacy::LOW;
-//  else if(dp=="none") Consumer::privacy_lvl=Privacy::NONE;
-//  else throw "privacy_lvl error\n";
   if(lv>MAXLVL || lv<MINLVL){
     throw "Privacy\n";
     return 1;
@@ -58,13 +53,18 @@ int Consumer::setData_Type(std::string type){
   else if(type=="power") Consumer::data_type=Data_Type::POWER;
   else if(type=="temp") Consumer::data_type=Data_Type::TEMP;
   else if(type=="wind") Consumer::data_type=Data_Type::WIND;
-  else if(type=="CO2") Consumer::data_type=Data_Type::CO2;
+  else if(type=="CO2" || type=="co2") Consumer::data_type=Data_Type::CO2;
   else throw "data_type error";
   return 0;
 }
 
 int Consumer::setinterval(int f){
   interval=f;
+  return 0;
+}
+
+int Consumer::setlocation(std::string l){
+  location=l;
   return 0;
 }
 
@@ -77,11 +77,6 @@ Node_ID Consumer::getNode_ID(){
 }
 
 Privacy Consumer::getPrivacy_lvl(){
-//  if(Consumer::privacy_lvl==Privacy::HIGH)return "high";
-//  else if(Consumer::privacy_lvl==Privacy::MID)return "mid";
-//  else if(Consumer::privacy_lvl==Privacy::LOW)return "low";
-//  else if(Consumer::privacy_lvl==Privacy::NONE)return "none";
-//  else throw "privacy_lvl error";
   return privacy_lvl;
 }
 
@@ -116,7 +111,7 @@ std::string Consumer::getData_Type(){
       return "wind";
       break;
     case Data_Type::CO2:
-      return "co2";
+      return "CO2";
       break;
     default:
       throw "data_type error";
@@ -125,6 +120,10 @@ std::string Consumer::getData_Type(){
 
 int Consumer::getinterval(){
   return Consumer::interval;
+}
+
+std::string Consumer::getlocation(){
+  return location;
 }
 
 //=============Vender=============
@@ -145,11 +144,6 @@ int Vender::setService_ID(Service_ID id){
 }
 
 int Vender::setPrivacy_lvl(Privacy lv){
-  //if(pr=="high") Vender::privacy_lvl=Privacy::HIGH;
-  //else if(pr=="mid") Vender::privacy_lvl=Privacy::MID;
-  //else if(pr=="low") Vender::privacy_lvl=Privacy::LOW;
-  //else if(pr=="none") Vender::privacy_lvl=Privacy::NONE;
-  //else throw "privacy_lvl error";
   if(lv>MAXLVL || lv<MINLVL){
     throw "Privacy\n";
     return 1;
@@ -163,7 +157,7 @@ int Vender::setData_Type(std::string type){
   else if(type=="power") Vender::data_type=Data_Type::POWER;
   else if(type=="temp") Vender::data_type=Data_Type::TEMP;
   else if(type=="wind") Vender::data_type=Data_Type::WIND;
-  else if(type=="CO2") Vender::data_type=Data_Type::CO2;
+  else if(type=="CO2" || type=="co2") Vender::data_type=Data_Type::CO2;
   else throw "data_type error";
   return 0;
 }
@@ -182,11 +176,6 @@ std::string Vender::getService_ID(){
 }
 
 Privacy Vender::getPrivacy_lvl(){
-  //if(Vender::privacy_lvl==Privacy::HIGH)return "high";
-  //else if(Vender::privacy_lvl==Privacy::MID)return "mid";
-  //else if(Vender::privacy_lvl==Privacy::LOW)return "low";
-  //else if(Vender::privacy_lvl==Privacy::NONE)return "none";
-  //else throw "privacy_lvl error";
   return privacy_lvl;
 }
 
@@ -195,7 +184,7 @@ std::string Vender::getData_Type(){
   else if(Vender::data_type==Data_Type::TEMP)return "temp";
   else if(Vender::data_type==Data_Type::NONE)return "none";
   else if(Vender::data_type==Data_Type::WIND)return "wind";
-  else if(Vender::data_type==Data_Type::CO2)return "co2";
+  else if(Vender::data_type==Data_Type::CO2)return "CO2";
   else throw "data_type error";
 }
 
@@ -225,11 +214,6 @@ int Relation::setAnonymization(std::string an){
 }
 
 int Relation::setPrivacy_lvl(Privacy lv){
-  //if(lvl=="high") Relation::privacy_lvl=Privacy::HIGH;
-  //else if(lvl=="mid") Relation::privacy_lvl=Privacy::MID;
-  //else if(lvl=="low") Relation::privacy_lvl=Privacy::LOW;
-  //else if(lvl=="none") Relation::privacy_lvl=Privacy::NONE;
-  //else throw "privacy_lvl error";
   if(lv>MAXLVL || lv<MINLVL){
     throw "Privacy\n";
     return 1;
@@ -238,19 +222,11 @@ int Relation::setPrivacy_lvl(Privacy lv){
   return 0;
 }
 
-//int Relation::addServices(Service_ID id){
-//  Relation::services.push_back(id);
-//  return 0;
-//}
 int Relation::setNode_ID(Node_ID id){
   node_id=id;
   return 0;
 }
 
-//int Relation::addNodes(Node_ID id){
-//  Relation::nodes.push_back(id);
-//  return 0;
-//}
 int Relation::setService_ID(Service_ID id){
   service_id=id;
   return 0;
@@ -273,24 +249,13 @@ std::string Relation::getAnonymization(){
 }
 
 Privacy Relation::getPrivacy_lvl(){
-  //if(Relation::privacy_lvl==Privacy::HIGH)return "high";
-  //else if(Relation::privacy_lvl==Privacy::MID)return "mid";
-  //else if(Relation::privacy_lvl==Privacy::LOW)return "low";
-  //else if(Relation::privacy_lvl==Privacy::NONE)return "none";
-  //else throw "privacy_lvl error";
   return privacy_lvl;
 }
 
-//std::vector<Service_ID> Relation::getServices(){
-//  return Relation::services;
-//}
 Node_ID Relation::getNode_ID(){
   return node_id;
 }
 
-//std::vector<Node_ID> Relation::getNodes(){
-//  return Relation::nodes;
-//}
 Service_ID Relation::getService_ID(){
   return service_id;
 }

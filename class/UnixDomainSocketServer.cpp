@@ -1,8 +1,11 @@
 #ifndef UNIX_DOMAIN_SOCKET_SERVER_CPP
 #define UNIX_DOMAIN_SOCKET_SERVER_CPP
 #include "UnixDomainSocketServer.h"
+#include <csignal>
 
 const std::string SOCK_NAME = "/tmp/unix-socket";
+
+void sigpipe_handle(int x) { }
 
 UnixDomainSocketServer::UnixDomainSocketServer():make(&mtx,&buffer){
   UnixDomainSocketServer::socketName_=SOCK_NAME;
@@ -79,8 +82,8 @@ void UnixDomainSocketServer::handle(int& client) {
     bool success;
     char req;
     int res;
-    if ((getReq(client, req))!='\0') {
-      std::cout<<req<<std::endl;
+    std::string xml;
+    if ((getXML(client, xml))!='\0') {
       switch(req){
         case 'a':{
           sendResponse(client, 0);
@@ -149,35 +152,35 @@ void UnixDomainSocketServer::handle(int& client) {
   }
 }
 
-bool UnixDomainSocketServer::getReq(int& client,char &req){
-  try{
-    int cc;
-    if((cc=recv(client, &req, sizeof(req), 0))>0){
-      return true;
-    }else{
-      return false;
-    }
-  }
-  catch(...){
-    closeSocket(client);
-    unlink(socketName_.c_str());
-  }
-}
-
-bool UnixDomainSocketServer::getAuth(int& client, AUTH &auth){
-  try{
-    int cc;
-    if((cc=recv(client, &auth, sizeof(auth), 0))>0){
-      return true;
-    }else{
-      return false;
-    }
-  }
-  catch(...){
-    closeSocket(client);
-    unlink(socketName_.c_str());
-  }
-}
+//bool UnixDomainSocketServer::getReq(int& client,char &req){
+//  try{
+//    int cc;
+//    if((cc=recv(client, &req, sizeof(req), 0))>0){
+//      return true;
+//    }else{
+//      return false;
+//    }
+//  }
+//  catch(...){
+//    closeSocket(client);
+//    unlink(socketName_.c_str());
+//  }
+//}
+//
+//bool UnixDomainSocketServer::getAuth(int& client, AUTH &auth){
+//  try{
+//    int cc;
+//    if((cc=recv(client, &auth, sizeof(auth), 0))>0){
+//      return true;
+//    }else{
+//      return false;
+//    }
+//  }
+//  catch(...){
+//    closeSocket(client);
+//    unlink(socketName_.c_str());
+//  }
+//}
 
 bool UnixDomainSocketServer::getXML(int& client, std::string &xml){
   try{
@@ -301,6 +304,7 @@ void UnixDomainSocketServer::notifyServer() {
 
 #endif
 int main(){
+  std::signal(SIGPIPE,sigpipe_handle);
   UnixDomainSocketServer server;
   server.run();
   return 0;
