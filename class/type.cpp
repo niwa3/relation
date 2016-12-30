@@ -237,6 +237,11 @@ int Relation::setinterval(int f){
   return 0;
 }
 
+int Relation::setlocation(std::string l){
+  location=l;
+  return 0;
+}
+
 Relation_ID Relation::getRelation_ID(){
   return Relation::relation_id;
 }
@@ -262,6 +267,10 @@ Service_ID Relation::getService_ID(){
 
 int Relation::getinterval(){
   return interval;
+}
+
+std::string Relation::getlocation(){
+  return location;
 }
 
 Relation::Relation(){

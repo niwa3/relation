@@ -110,9 +110,9 @@ char *RManagerProxy::soap_sprint_fault(char *buf, size_t len)
 }
 #endif
 
-int RManagerProxy::data(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res)
+int RManagerProxy::register_(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res)
 {	struct soap *soap = this;
-	struct ns1__data soap_tmp_ns1__data;
+	struct ns1__register soap_tmp_ns1__register;
 	if (endpoint)
 		soap_endpoint = endpoint;
 	if (soap_endpoint == NULL)
@@ -121,16 +121,16 @@ int RManagerProxy::data(const char *endpoint, const char *soap_action, ns1__tran
 		soap_action = "";
 	soap_begin(soap);
 	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";
-	soap_tmp_ns1__data.req = req;
+	soap_tmp_ns1__register.req = req;
 	soap_serializeheader(soap);
-	soap_serialize_ns1__data(soap, &soap_tmp_ns1__data);
+	soap_serialize_ns1__register(soap, &soap_tmp_ns1__register);
 	if (soap_begin_count(soap))
 		return soap->error;
 	if (soap->mode & SOAP_IO_LENGTH)
 	{	if (soap_envelope_begin_out(soap)
 		 || soap_putheader(soap)
 		 || soap_body_begin_out(soap)
-		 || soap_put_ns1__data(soap, &soap_tmp_ns1__data, "ns1:data", NULL)
+		 || soap_put_ns1__register(soap, &soap_tmp_ns1__register, "ns1:register", NULL)
 		 || soap_body_end_out(soap)
 		 || soap_envelope_end_out(soap))
 			 return soap->error;
@@ -141,7 +141,119 @@ int RManagerProxy::data(const char *endpoint, const char *soap_action, ns1__tran
 	 || soap_envelope_begin_out(soap)
 	 || soap_putheader(soap)
 	 || soap_body_begin_out(soap)
-	 || soap_put_ns1__data(soap, &soap_tmp_ns1__data, "ns1:data", NULL)
+	 || soap_put_ns1__register(soap, &soap_tmp_ns1__register, "ns1:register", NULL)
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap_closesock(soap);
+	if (!&res)
+		return soap_closesock(soap);
+	res.soap_default(soap);
+	if (soap_begin_recv(soap)
+	 || soap_envelope_begin_in(soap)
+	 || soap_recv_header(soap)
+	 || soap_body_begin_in(soap))
+		return soap_closesock(soap);
+	if (soap_recv_fault(soap, 1))
+		return soap->error;
+	res.soap_get(soap, "", "");
+	if (soap->error)
+		return soap_recv_fault(soap, 0);
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap_closesock(soap);
+	return soap_closesock(soap);
+}
+
+int RManagerProxy::change(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res)
+{	struct soap *soap = this;
+	struct ns1__change soap_tmp_ns1__change;
+	if (endpoint)
+		soap_endpoint = endpoint;
+	if (soap_endpoint == NULL)
+		soap_endpoint = "http://10.0.0.2/cgi-bin/server.cgi";
+	if (soap_action == NULL)
+		soap_action = "";
+	soap_begin(soap);
+	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";
+	soap_tmp_ns1__change.req = req;
+	soap_serializeheader(soap);
+	soap_serialize_ns1__change(soap, &soap_tmp_ns1__change);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || soap_put_ns1__change(soap, &soap_tmp_ns1__change, "ns1:change", NULL)
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	}
+	if (soap_end_count(soap))
+		return soap->error;
+	if (soap_connect(soap, soap_url(soap, soap_endpoint, NULL), soap_action)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || soap_put_ns1__change(soap, &soap_tmp_ns1__change, "ns1:change", NULL)
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap_closesock(soap);
+	if (!&res)
+		return soap_closesock(soap);
+	res.soap_default(soap);
+	if (soap_begin_recv(soap)
+	 || soap_envelope_begin_in(soap)
+	 || soap_recv_header(soap)
+	 || soap_body_begin_in(soap))
+		return soap_closesock(soap);
+	if (soap_recv_fault(soap, 1))
+		return soap->error;
+	res.soap_get(soap, "", "");
+	if (soap->error)
+		return soap_recv_fault(soap, 0);
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap_closesock(soap);
+	return soap_closesock(soap);
+}
+
+int RManagerProxy::delete_(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res)
+{	struct soap *soap = this;
+	struct ns1__delete soap_tmp_ns1__delete;
+	if (endpoint)
+		soap_endpoint = endpoint;
+	if (soap_endpoint == NULL)
+		soap_endpoint = "http://10.0.0.2/cgi-bin/server.cgi";
+	if (soap_action == NULL)
+		soap_action = "";
+	soap_begin(soap);
+	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";
+	soap_tmp_ns1__delete.req = req;
+	soap_serializeheader(soap);
+	soap_serialize_ns1__delete(soap, &soap_tmp_ns1__delete);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || soap_put_ns1__delete(soap, &soap_tmp_ns1__delete, "ns1:delete", NULL)
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	}
+	if (soap_end_count(soap))
+		return soap->error;
+	if (soap_connect(soap, soap_url(soap, soap_endpoint, NULL), soap_action)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || soap_put_ns1__delete(soap, &soap_tmp_ns1__delete, "ns1:delete", NULL)
 	 || soap_body_end_out(soap)
 	 || soap_envelope_end_out(soap)
 	 || soap_end_send(soap))

@@ -304,7 +304,7 @@ void UnixDomainSocketServer::notifyServer() {
 
 #endif
 int main(){
-  std::signal(SIGPIPE,sigpipe_handle);
+  std::signal(SIGPIPE,SIG_IGN);
   UnixDomainSocketServer server;
   server.run();
   return 0;

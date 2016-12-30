@@ -77,7 +77,13 @@ class SOAP_CMAC RManagerService : public soap
 	/// Note: compile with -DWITH_PURE_VIRTUAL for pure virtual methods
 	///
 
-	/// Web service operation 'data' (returns error code or SOAP_OK)
-	virtual	int data(ns1__transport *req, ns1__transport &res) SOAP_PURE_VIRTUAL;
+	/// Web service operation 'register' (returns error code or SOAP_OK)
+	virtual	int register_(ns1__transport *req, ns1__transport &res) SOAP_PURE_VIRTUAL;
+
+	/// Web service operation 'change' (returns error code or SOAP_OK)
+	virtual	int change(ns1__transport *req, ns1__transport &res) SOAP_PURE_VIRTUAL;
+
+	/// Web service operation 'delete' (returns error code or SOAP_OK)
+	virtual	int delete_(ns1__transport *req, ns1__transport &res) SOAP_PURE_VIRTUAL;
 };
 #endif

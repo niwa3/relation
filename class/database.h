@@ -17,22 +17,22 @@ class DataBase{
     std::unique_ptr<pqxx::work> T;
   public:
     DataBase(std::string call);
-    int insertValue(Consumer c);
-    int insertValue(Vender v);
-    int insertValue(Relation r);
+    bool insertValue(Consumer c);
+    bool insertValue(Vender v);
+    bool insertValue(Relation r);
 
-    int deleteValue(std::string kind, std::string id);
-    int deleteRelation(Node_ID, Service_ID);
+    bool deleteValue(std::string kind, std::string id);
+    bool deleteRelation(Node_ID, Service_ID);
 
-    int selectValue(std::string req, std::vector<Consumer> &c_res);
-    int selectValue(std::string req, std::vector<Vender> &v_res);
-    int selectValue(std::string req, std::vector<Relation> &r_res);
+    bool selectValue(std::string req, std::vector<Consumer> &c_res);
+    bool selectValue(std::string req, std::vector<Vender> &v_res);
+    bool selectValue(std::string req, std::vector<Relation> &r_res);
 
-    int checkValue(Consumer c){};
-    int checkValue(Vender v){};
-    int checkValue(Relation r){};
+    bool checkValue(Consumer c){};
+    bool checkValue(Vender v){};
+    bool checkValue(Relation r){};
 
-    int updataRelationPrivacy(Node_ID, Service_ID, int);
+    bool updataRelationPrivacy(Node_ID, Service_ID, int);
 
     bool authUser(std::string username,std::string password, std::string &userid);
     bool authVender(std::string vendername,std::string password, std::string &venderid);

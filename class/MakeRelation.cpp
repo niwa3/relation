@@ -3,10 +3,8 @@
 #define MAKE_RELATION_CPP
 #include "MakeRelation.h"
 //========MakeRelation========
-MakeRelation::MakeRelation(std::mutex* m, std::vector<ACK>* b){
+MakeRelation::MakeRelation(){
   dbopt="dbname=test user=testuser password=testpass";
-  mtx=m;
-  buffer=b;
 }
 
 MakeRelation::~MakeRelation(){}
@@ -40,23 +38,32 @@ bool MakeRelation::make_from_node(Consumer newnode){
         return false;
       }
     }
+    /* ここで登録されたノードとサービスのマッチングを行う
+     * どのようにマッチングをするべきかは要研究
+     * 現在は，
+     * データタイプが一致し，
+     * 要求プライバシがプライバシ基準を上回っているもの
+     * データ要求間隔が，データ取得間隔よりも長いもの
+     * をマッチングさせている．
+     */
     database.selectValue("privacy_lvl >= " + std::to_string(newnode.getPrivacy_lvl()) + " AND data_type = " + database.quote(newnode.getData_Type()) + " AND interval >= " + std::to_string(newnode.getinterval()), match_service);
 
-    std::vector<Relation> rv;
+    std::map<std::string, std::vector<Relation> > m_rv;
     for(sitr=match_service.begin();sitr!=match_service.end();sitr++){
-      std::cout<<"match_service:"<<sitr->getService_ID()<<std::endl;
       Relation tmp;
       tmp.setNode_ID(newnode.getNode_ID());
       tmp.setService_ID(sitr->getService_ID());
       tmp.setAnonymization("noise");
       tmp.setPrivacy_lvl(sitr->getPrivacy_lvl());
       tmp.setinterval(sitr->getinterval());
+      tmp.setlocation(newnode.getlocation());
       if(database.insertValue(tmp))std::cout<<"exist\n";
-      database.selectValue("nodeid = " + database.quote(newnode.getNode_ID()) + " AND serviceid = " + database.quote(sitr->getService_ID()), rv);
+      database.selectValue("nodeid = " + database.quote(newnode.getNode_ID()) + " AND serviceid = " + database.quote(sitr->getService_ID()), m_rv[tmp.getlocation()]);
     }
     mySoapClient msclient;
-    msclient.sendRelation("https://10.24.129.39:12345",rv);
-
+    for(auto m_itr=m_rv.begin(); m_itr!=m_rv.end(); m_itr++){
+      msclient.sendRelation(m_itr->first,m_itr->second);
+    }
     return true;
   }
   catch(...){
@@ -77,6 +84,7 @@ bool MakeRelation::make_from_service(Vender newservice){
     }
     database.selectValue("privacy_lvl <= " + std::to_string(newservice.getPrivacy_lvl()) + " AND data_type = " + database.quote(newservice.getData_Type()) + " AND interval <= " + std::to_string(newservice.getinterval()), match_node);
 
+    std::map<std::string, std::vector<Relation> > m_rv;
     for(nitr=match_node.begin();nitr!=match_node.end();nitr++){
       Relation tmp;
       tmp.setNode_ID(nitr->getNode_ID());
@@ -84,7 +92,13 @@ bool MakeRelation::make_from_service(Vender newservice){
       tmp.setAnonymization("noise");
       tmp.setPrivacy_lvl(newservice.getPrivacy_lvl());
       tmp.setinterval(newservice.getinterval());
+      tmp.setlocation(nitr->getlocation());
       if(database.insertValue(tmp))std::cout<<"exist\n";
+      database.selectValue("nodeid = " + database.quote(nitr->getNode_ID()) + " AND serviceid = " + database.quote(newservice.getService_ID()), m_rv[tmp.getlocation()]);
+    }
+    mySoapClient msclient;
+    for(auto m_itr=m_rv.begin(); m_itr!=m_rv.end(); m_itr++){
+      msclient.sendRelation(m_itr->first,m_itr->second);
     }
     return true;
   }
@@ -122,24 +136,31 @@ bool MakeRelation::delete_relation(Node_ID nodeid, Service_ID serviceid, User_ID
 }
 
 #endif
-//int main(){
-//  try{
-//  std::mutex *m=new std::mutex();
-//  std::vector<std::string> *buffer=new std::vector<std::string>();
-//  MakeRelation make(m,buffer);
-//  make.make_from_node("http://GW/sensor1");
-//  make.make_from_node("http://GW/sensor2");
-//  make.make_from_node("http://GW/sensor3");
-//  make.make_from_service("http://service/dummy1");
-//  make.make_from_service("http://service/dummy2");
-//  make.change_privacy_from_node("http://GW/sensor1","http://service/dummy4",1);
-//  make.delete_relation("http://GW/sensor3", "http://service/dummy4");
-//  delete(m);
-//  delete(buffer);
-//  return 0;
-//  }
-//  catch(...){
-//    std::cerr<<"err"<<std::endl;
-//    return 1;
-//  }
-//}
+int main(){
+  try{
+  MakeRelation make;
+  //Consumer c;
+  //c.setNode_ID("http");
+  //c.setUser_ID("u00001");
+  //c.setData_Type("power");
+  //c.setNode_Type("sensor");
+  //c.setPrivacy_lvl(2);
+  //c.setinterval(60);
+  //c.setlocation("http:");
+  //make.make_from_node(c);
+  //Vender v;
+  //v.setService_ID("http");
+  //v.setVender_ID("v0001");
+  //v.setData_Type("power");
+  //v.setPrivacy_lvl(2);
+  //v.setinterval(60);
+  //make.make_from_service(v);
+  //make.change_privacy_from_node("http://GW/sensor1","http://service/dummy4",1);
+  //make.delete_relation("http://GW/sensor3", "http://service/dummy4");
+  return 0;
+  }
+  catch(...){
+    std::cerr<<"err"<<std::endl;
+    return 1;
+  }
+}

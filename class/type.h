@@ -79,6 +79,7 @@ class Relation{
     Service_ID service_id;
     Node_ID node_id;
     int interval;
+    std::string location;
 
   public:
     int setRelation_ID(Relation_ID id);
@@ -87,12 +88,14 @@ class Relation{
     int setService_ID(Service_ID id);
     int setNode_ID(Node_ID);
     int setinterval(int);
+    int setlocation(std::string);
     Relation_ID getRelation_ID();
     std::string getAnonymization();
     Privacy getPrivacy_lvl();
     Service_ID getService_ID();
     Node_ID getNode_ID();
     int getinterval();
+    std::string getlocation();
     Relation();
     ~Relation();
 };
@@ -106,8 +109,8 @@ struct ACK{
 };
 
 struct AUTH{
-  char username[64]={'\0'};
-  char password[64]={'\0'};
+  std::string username;
+  std::string password;
 };
 
 #endif

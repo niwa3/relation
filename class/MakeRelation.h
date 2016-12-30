@@ -6,13 +6,14 @@
 #include <iostream>
 #include <string>
 #include <mutex>
+#include <map>
 #include "database.h"
 #include "type.h"
 #include "../client/mySoapClient.h"
 
 class MakeRelation{
   public:
-    MakeRelation(std::mutex*, std::vector<ACK>*);
+    MakeRelation();
     ~MakeRelation();
     //void run();
     bool auth_user(std::string username, std::string password, std::string &userid);
@@ -24,8 +25,6 @@ class MakeRelation{
     bool auth_user(AUTH);
 
   private:
-    std::mutex *mtx;
-    std::vector<ACK> *buffer;
     std::string dbopt;
 };
 

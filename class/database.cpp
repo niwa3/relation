@@ -13,7 +13,7 @@ DataBase::~DataBase(){
   DataBase::T.get()->commit();
 }
 
-int DataBase::insertValue(Consumer c){
+bool DataBase::insertValue(Consumer c){
   try{
     if(c.getNode_ID().empty()){
       VALUEERR err = "no nodeid.";
@@ -50,31 +50,31 @@ int DataBase::insertValue(Consumer c){
 
     if(result.size() != 0){
       std::cerr<<c.getNode_ID()<<" is existing."<<std::endl;
-      return 1;
+      return false;
     }
     else{
       T.get()->exec(
           "INSERT INTO node "
           "VALUES (" + T.get()->quote(c.getNode_ID()) + "," + T.get()->quote(c.getUser_ID()) + "," + T.get()->quote(c.getPrivacy_lvl()) + "," +T.get()->quote(c.getNode_Type()) + "," + T.get()->quote(c.getData_Type()) + "," + std::to_string(c.getinterval()) + "," + T.get()->quote(c.getlocation()) + ");");
-      return 0;
+      return true;
     }
   }
   catch(VALUEERR e){
     std::cerr<<e<<std::endl;
-    return 1;
+    return false;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return 1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return 1;
+    return false;
   }
 }
 
 
-int DataBase::insertValue(Vender v){
+bool DataBase::insertValue(Vender v){
   try{
     if(v.getService_ID().empty()){
       VALUEERR err = "no serviceid.";
@@ -104,32 +104,32 @@ int DataBase::insertValue(Vender v){
 
     if(result.size() != 0){
       std::cerr<<v.getService_ID()<<" is existing."<<std::endl;
-      return 1;
+      return false;
     }
     else{
       T.get()->exec(
           "INSERT INTO service "
           "VALUES (" + T.get()->quote(v.getService_ID()) + "," + T.get()->quote(v.getVender_ID()) + "," + T.get()->quote(v.getPrivacy_lvl()) + "," +T.get()->quote(v.getData_Type()) + "," + std::to_string(v.getinterval()) + ")");
-      return 0;
+      return true;
     }
   }
   catch(VALUEERR e){
     std::cerr<< e <<std::endl;
-    return 1;
+    return false;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return 1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return 1;
+    return false;
   }
 }
 
 
 
-int DataBase::insertValue(Relation r){
+bool DataBase::insertValue(Relation r){
   try{
     if(r.getAnonymization().empty()){
       VALUEERR err = "no anonymous.";
@@ -151,10 +151,14 @@ int DataBase::insertValue(Relation r){
       VALUEERR err = "interval";
       throw err;
     }
+    else if(r.getlocation().empty()){
+      VALUEERR err = "location";
+      throw err;
+    }
   }
   catch (VALUEERR e){
     std::cerr<< e << std::endl;
-    return 1;
+    return false;
   }
   try{
     pqxx::result result=T.get()->exec(
@@ -164,7 +168,7 @@ int DataBase::insertValue(Relation r){
         "AND serviceid = " + T.get()->quote(r.getService_ID()));
     if(!result.empty()){
       std::cout<<result.begin()["relationid"].as<int>()<<" is exist"<<std::endl;
-      return 1;
+      return false;
     }
     result=T.get()->exec(
         "SELECT coalesce(max(relationid), 0) +1 AS gap "
@@ -176,22 +180,22 @@ int DataBase::insertValue(Relation r){
 
     T.get()->exec(
         "INSERT INTO relation "
-        "VALUES (" + std::to_string(r.getRelation_ID()) + "," + T.get()->quote(r.getService_ID()) + "," + T.get()->quote(r.getNode_ID()) + "," + std::to_string(r.getPrivacy_lvl()) + "," + T.get()->quote(r.getAnonymization()) + "," + std::to_string(r.getinterval()) + ")");
-    return 0;
+        "VALUES (" + std::to_string(r.getRelation_ID()) + "," + T.get()->quote(r.getService_ID()) + "," + T.get()->quote(r.getNode_ID()) + "," + std::to_string(r.getPrivacy_lvl()) + "," + T.get()->quote(r.getAnonymization()) + "," + std::to_string(r.getinterval()) + "," + T.get()->quote(r.getlocation()) + ")");
+    return true;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
 }
 
 
 
-int DataBase::deleteValue(std::string kind, std::string id){
+bool DataBase::deleteValue(std::string kind, std::string id){
   try{
     if(id.empty()){
       VALUEERR err = "no id.";
@@ -200,7 +204,7 @@ int DataBase::deleteValue(std::string kind, std::string id){
   }
   catch (VALUEERR e){
     std::cerr<< e << std::endl;
-    return 1;
+    return false;
   }
 
   try{
@@ -209,29 +213,29 @@ int DataBase::deleteValue(std::string kind, std::string id){
           "DELETE "
           "FROM node "
           "WHERE nodeid =" +T.get()->quote(id));
-     return 0;
+     return true;
     }
     if(kind=="service"){
       T.get()->exec(
           "DELETE "
           "FROM service "
           "WHERE serviceid =" + T.get()->quote(id));
-      return 0;
+      return true;
     }
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
 }
 
 
 
-int DataBase::deleteRelation(Node_ID nodeid, Service_ID serviceid){
+bool DataBase::deleteRelation(Node_ID nodeid, Service_ID serviceid){
   try{
     if(nodeid.empty()){
       VALUEERR err = "no nodeid.";
@@ -244,27 +248,26 @@ int DataBase::deleteRelation(Node_ID nodeid, Service_ID serviceid){
   }
   catch (VALUEERR e){
     std::cerr<< e << std::endl;
-    return 1;
+    return false;
   }
   try{
     T.get()->exec(
         "DELETE "
         "FROM relation "
         "WHERE serviceid = " + T.get()->quote(serviceid) + " AND nodeid = " + T.get()->quote(nodeid));
-    return 0;
+    return true;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
- 
 }
 
-int DataBase::selectValue(std::string req, std::vector<Consumer> &c_res){
+bool DataBase::selectValue(std::string req, std::vector<Consumer> &c_res){
   try{
     pqxx::result r=T.get()->exec(
         "SELECT * "
@@ -278,27 +281,27 @@ int DataBase::selectValue(std::string req, std::vector<Consumer> &c_res){
       tmp.setNode_Type(it["node_type"].as<std::string>());
       tmp.setData_Type(it["data_type"].as<std::string>());
       tmp.setinterval(it["interval"].as<int>());
-
+      tmp.setlocation(it["location"].as<std::string>());
       c_res.push_back(tmp);
     }
-    return 0;
+    return true;
   }
   catch(std::string e){
     std::cerr<<e<<std::endl;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
 }
 
 
 
-int DataBase::selectValue(std::string req, std::vector<Vender> &v_res){
+bool DataBase::selectValue(std::string req, std::vector<Vender> &v_res){
   try{
     pqxx::result r=T.get()->exec(
         "SELECT * "
@@ -313,24 +316,24 @@ int DataBase::selectValue(std::string req, std::vector<Vender> &v_res){
       tmp.setinterval(it["interval"].as<int>());
       v_res.push_back(tmp);
     }
-    return 0;
+    return true;
   }
   catch(std::string e){
     std::cerr<<e<<std::endl;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
 }
 
 
 
-int DataBase::selectValue(std::string req, std::vector<Relation> &r_res){
+bool DataBase::selectValue(std::string req, std::vector<Relation> &r_res){
   try{
     pqxx::result r=T.get()->exec(
         "SELECT * "
@@ -344,20 +347,21 @@ int DataBase::selectValue(std::string req, std::vector<Relation> &r_res){
       tmp.setAnonymization(it["anonymization_method"].as<std::string>());
       tmp.setPrivacy_lvl(it["privacy_lvl"].as<int>());
       tmp.setinterval(it["interval"].as<int>());
+      tmp.setlocation(it["location"].as<std::string>());
       r_res.push_back(tmp);
     }
-    return 0;
+    return true;
   }
   catch(std::string e){
     std::cerr<<e<<std::endl;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select id from test"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
 }
 
@@ -365,23 +369,24 @@ std::string DataBase::quote(std::string in){
   return T.get()->quote(in);
 }
 
-int DataBase::updataRelationPrivacy(Node_ID nodeid, Service_ID serviceid, int lvl){
+bool DataBase::updataRelationPrivacy(Node_ID nodeid, Service_ID serviceid, int lvl){
   try{
     pqxx::result result=T.get()->exec("SELECT relationid FROM relation WHERE nodeid = " + T.get()->quote(nodeid) + "AND serviceid = " + T.get()->quote(serviceid));
-    if(result.empty())return 1;
+    if(result.empty())return false;
     T.get()->exec("UPDATE relation SET privacy_lvl = " + std::to_string(lvl) + " WHERE relationid = " + result.begin()["relationid"].as<std::string>());
-    return 0;
+    return true;
   }
   catch(const pqxx::sql_error& e){
     std::cerr<<e.what()<<": SQL->"<<"select relationid from relation"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
   catch(...){
     std::cerr<<"err\n";
+    return false;
   }
 }
 
@@ -456,11 +461,11 @@ bool DataBase::insertUser(std::string username, std::string password){
     return true;
   }
   catch(const pqxx::sql_error& e){ std::cerr<<e.what()<<": SQL->"<<"select relationid from relation"<<std::endl;
-    return -1;
+    return false;
   }
   catch(const pqxx::usage_error& e){
     std::cerr<<e.what()<<std::endl;
-    return -1;
+    return false;
   }
   catch(...){
     std::cerr<<"err\n";
@@ -494,25 +499,25 @@ std::vector<std::string> split(const std::string &str, char sep){
 
 
 #endif
-int main(){
-  DataBase db("dbname=test user=testuser password=testpass");
-  Consumer c[10];
-  for(int i=0;i<10;i++){
-  c[i].setNode_ID("http://GW/sensor"+std::to_string(i));
-  c[i].setUser_ID("jhon");
-  if(i%3==0)  c[i].setPrivacy_lvl(1);
-  else if(i%3==1) c[i].setPrivacy_lvl(2);
-  else c[i].setPrivacy_lvl(3);
-  //if(i%2==0) c[i].setNode_Type("sensor");
-  //else c[i].setNode_Type("actuator");
-  c[i].setNode_Type("sensor");
-  if(i%2==0) c[i].setData_Type("power");
-  else c[i].setData_Type("temp");
-  c[i].setinterval((i+1)*60);
-  c[i].setlocation("http://10.24.129.39");
-  db.deleteValue("node",c[i].getNode_ID());
-  db.insertValue(c[i]);
-  }
+//int main(){
+//  DataBase db("dbname=test user=testuser password=testpass");
+//  Consumer c[10];
+//  for(int i=0;i<10;i++){
+//  c[i].setNode_ID("http://GW/sensor"+std::to_string(i));
+//  c[i].setUser_ID("jhon");
+//  if(i%3==0)  c[i].setPrivacy_lvl(1);
+//  else if(i%3==1) c[i].setPrivacy_lvl(2);
+//  else c[i].setPrivacy_lvl(3);
+//  //if(i%2==0) c[i].setNode_Type("sensor");
+//  //else c[i].setNode_Type("actuator");
+//  c[i].setNode_Type("sensor");
+//  if(i%2==0) c[i].setData_Type("power");
+//  else c[i].setData_Type("temp");
+//  c[i].setinterval((i+1)*60);
+//  c[i].setlocation("http://10.24.129.39");
+//  db.deleteValue("node",c[i].getNode_ID());
+//  db.insertValue(c[i]);
+//  }
 //  std::vector<Consumer> res;
 //  db.selectValue("privacy_lvl >= 2",res);
 //
@@ -602,7 +607,7 @@ int main(){
 //  else std::cerr<<"cant";
 //
 //
-  return 0;
-}
+//  return 0;
+//}
 
 

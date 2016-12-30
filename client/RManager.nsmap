@@ -1,5 +1,4 @@
-#ifndef INCLUDED_RMANAGER_NAMESPACE
-#define INCLUDED_RMANAGER_NAMESPACE
+
 #include "soapH.h"
 SOAP_NMAC struct Namespace namespaces[] =
 {
@@ -10,5 +9,3 @@ SOAP_NMAC struct Namespace namespaces[] =
 	{"ns1", "urn:rm", NULL, NULL},
 	{NULL, NULL, NULL, NULL}
 };
-
-#endif

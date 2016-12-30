@@ -12,17 +12,18 @@
   <complexType name="relation"><!-- ns1__relation -->
 
    <sequence>
-     <element name="node-id" type="xsd:anyURI" minOccurs="1" maxOccurs="unbounded"/><!-- ns1__relation::node_id -->
-     <element name="service-id" type="xsd:anyURI" minOccurs="1" maxOccurs="unbounded"/><!-- ns1__relation::service_id -->
+     <element name="node-id" type="xsd:anyURI" minOccurs="1" maxOccurs="1"/><!-- ns1__relation::node_id -->
+     <element name="service-id" type="xsd:anyURI" minOccurs="1" maxOccurs="1"/><!-- ns1__relation::service_id -->
+     <element name="relation-id" type="xsd:int" minOccurs="1" maxOccurs="1"/><!-- ns1__relation::relation_id -->
+     <element name="anonymous-method" type="xsd:string" minOccurs="1" maxOccurs="1"/><!-- ns1__relation::anonymous_method -->
+     <element name="privacy-lvl" type="xsd:int" minOccurs="1" maxOccurs="1"/><!-- ns1__relation::privacy_lvl -->
+     <element name="interval" type="xsd:int" minOccurs="1" maxOccurs="1"/><!-- ns1__relation::interval -->
    </sequence>
-     <attribute name="relation-id" type="xsd:int" use="required"/><!-- ns1__relation::relation_id -->
-     <attribute name="anonymous-method" type="xsd:string" use="required"/><!-- ns1__relation::anonymous_method -->
-     <attribute name="privacy-lvl" type="xsd:string" use="required"/><!-- ns1__relation::privacy_lvl -->
   </complexType>
   <complexType name="body"><!-- ns1__body -->
 
    <sequence>
-     <element name="relation" type="ns1:relation" minOccurs="0" maxOccurs="unbounded" nillable="true"/><!-- ns1__body::relation -->
+     <element name="relation" type="ns1:relation" minOccurs="0" maxOccurs="unbounded"/><!-- ns1__body::relation -->
    </sequence>
   </complexType>
   <complexType name="header"><!-- ns1__header -->
@@ -31,22 +32,5 @@
    </sequence>
      <attribute name="massage" type="xsd:string" use="required"/><!-- ns1__header::massage -->
   </complexType>
-  <complexType name="transport"><!-- ns1__transport -->
-
-   <sequence>
-     <element name="header" type="ns1:header" minOccurs="1" maxOccurs="1" nillable="true"/><!-- ns1__transport::header -->
-     <element name="body" type="ns1:body" minOccurs="1" maxOccurs="1" nillable="true"/><!-- ns1__transport::body -->
-   </sequence>
-  </complexType>
-  <complexType name="dataRQ"><!-- _ns1__dataRQ -->
-
-   <sequence>
-     <element name="transport" type="ns1:transport" minOccurs="1" maxOccurs="1" nillable="true"/><!-- _ns1__dataRQ::transport -->
-   </sequence>
-  </complexType>
-  <!-- operation request element -->
-  <element name="req" type="ns1:dataRQ"/>
-  <!-- operation response element -->
-  <element name="transport" type="ns1:transport"/>
  </schema>
 

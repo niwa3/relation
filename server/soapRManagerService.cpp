@@ -175,27 +175,115 @@ int RManagerService::serve()
 	return SOAP_OK;
 }
 
-static int serve_ns1__data(RManagerService*);
+static int serve_ns1__register(RManagerService*);
+static int serve_ns1__change(RManagerService*);
+static int serve_ns1__delete(RManagerService*);
 
 int RManagerService::dispatch()
 {	soap_peek_element(this);
-	if (!soap_match_tag(this, this->tag, "ns1:data"))
-		return serve_ns1__data(this);
+	if (!soap_match_tag(this, this->tag, "ns1:register"))
+		return serve_ns1__register(this);
+	if (!soap_match_tag(this, this->tag, "ns1:change"))
+		return serve_ns1__change(this);
+	if (!soap_match_tag(this, this->tag, "ns1:delete"))
+		return serve_ns1__delete(this);
 	return this->error = SOAP_NO_METHOD;
 }
 
-static int serve_ns1__data(RManagerService *soap)
-{	struct ns1__data soap_tmp_ns1__data;
+static int serve_ns1__register(RManagerService *soap)
+{	struct ns1__register soap_tmp_ns1__register;
 	ns1__transport res;
 	res.soap_default(soap);
-	soap_default_ns1__data(soap, &soap_tmp_ns1__data);
-	if (!soap_get_ns1__data(soap, &soap_tmp_ns1__data, "ns1:data", NULL))
+	soap_default_ns1__register(soap, &soap_tmp_ns1__register);
+	if (!soap_get_ns1__register(soap, &soap_tmp_ns1__register, "ns1:register", NULL))
 		return soap->error;
 	if (soap_body_end_in(soap)
 	 || soap_envelope_end_in(soap)
 	 || soap_end_recv(soap))
 		return soap->error;
-	soap->error = soap->data(soap_tmp_ns1__data.req, res);
+	soap->error = soap->register_(soap_tmp_ns1__register.req, res);
+	if (soap->error)
+		return soap->error;
+	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";
+	soap_serializeheader(soap);
+	res.soap_serialize(soap);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || res.soap_put(soap, "ns1:transport", "")
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	};
+	if (soap_end_count(soap)
+	 || soap_response(soap, SOAP_OK)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || res.soap_put(soap, "ns1:transport", "")
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap->error;
+	return soap_closesock(soap);
+}
+
+static int serve_ns1__change(RManagerService *soap)
+{	struct ns1__change soap_tmp_ns1__change;
+	ns1__transport res;
+	res.soap_default(soap);
+	soap_default_ns1__change(soap, &soap_tmp_ns1__change);
+	if (!soap_get_ns1__change(soap, &soap_tmp_ns1__change, "ns1:change", NULL))
+		return soap->error;
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap->error;
+	soap->error = soap->change(soap_tmp_ns1__change.req, res);
+	if (soap->error)
+		return soap->error;
+	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";
+	soap_serializeheader(soap);
+	res.soap_serialize(soap);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || res.soap_put(soap, "ns1:transport", "")
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	};
+	if (soap_end_count(soap)
+	 || soap_response(soap, SOAP_OK)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || res.soap_put(soap, "ns1:transport", "")
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap->error;
+	return soap_closesock(soap);
+}
+
+static int serve_ns1__delete(RManagerService *soap)
+{	struct ns1__delete soap_tmp_ns1__delete;
+	ns1__transport res;
+	res.soap_default(soap);
+	soap_default_ns1__delete(soap, &soap_tmp_ns1__delete);
+	if (!soap_get_ns1__delete(soap, &soap_tmp_ns1__delete, "ns1:delete", NULL))
+		return soap->error;
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap->error;
+	soap->error = soap->delete_(soap_tmp_ns1__delete.req, res);
 	if (soap->error)
 		return soap->error;
 	soap->encodingStyle = "http://schemas.xmlsoap.org/soap/encoding/";

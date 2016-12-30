@@ -62,8 +62,16 @@ class SOAP_CMAC RManagerProxy : public soap
 	virtual	char *soap_sprint_fault(char *buf, size_t len);
 #endif
 
-	/// Web service operation 'data' (returns error code or SOAP_OK)
-	virtual	int data(ns1__transport *req, ns1__transport &res) { return this->data(NULL, NULL, req, res); }
-	virtual	int data(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res);
+	/// Web service operation 'register' (returns error code or SOAP_OK)
+	virtual	int register_(ns1__transport *req, ns1__transport &res) { return this->register_(NULL, NULL, req, res); }
+	virtual	int register_(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res);
+
+	/// Web service operation 'change' (returns error code or SOAP_OK)
+	virtual	int change(ns1__transport *req, ns1__transport &res) { return this->change(NULL, NULL, req, res); }
+	virtual	int change(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res);
+
+	/// Web service operation 'delete' (returns error code or SOAP_OK)
+	virtual	int delete_(ns1__transport *req, ns1__transport &res) { return this->delete_(NULL, NULL, req, res); }
+	virtual	int delete_(const char *endpoint, const char *soap_action, ns1__transport *req, ns1__transport &res);
 };
 #endif
