@@ -136,9 +136,9 @@ bool MakeRelation::delete_relation(Node_ID nodeid, Service_ID serviceid, User_ID
 }
 
 #endif
-int main(){
-  try{
-  MakeRelation make;
+//int main(){
+//  try{
+//  MakeRelation make;
   //Consumer c;
   //c.setNode_ID("http");
   //c.setUser_ID("u00001");
@@ -157,10 +157,10 @@ int main(){
   //make.make_from_service(v);
   //make.change_privacy_from_node("http://GW/sensor1","http://service/dummy4",1);
   //make.delete_relation("http://GW/sensor3", "http://service/dummy4");
-  return 0;
-  }
-  catch(...){
-    std::cerr<<"err"<<std::endl;
-    return 1;
-  }
-}
+//  return 0;
+//  }
+//  catch(...){
+//    std::cerr<<"err"<<std::endl;
+//    return 1;
+//  }
+//}

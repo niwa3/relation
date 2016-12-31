@@ -28,18 +28,13 @@ class UnixDomainSocketClient{
   private:
     void create();
     void handle();
-    bool send_ack();
-    bool send_req(char);
-    bool send_auth(AUTH);
     bool send_XML(std::string);
     bool send_response(int);
-    bool get_response();
-    bool get_userid();
-    bool get_XML();
+    bool get_response(int&);
+    bool get_XML(std::string&);
     void close_socket();
 
     int server_;
-    struct ACK ack_;
     std::string socket_name_;
     int name;
     int num;

@@ -3,15 +3,17 @@
 #include "UnixDomainSocketServer.h"
 #include <csignal>
 
+volatile sig_atomic_t eflag=0;
 const std::string SOCK_NAME = "/tmp/unix-socket";
 
-void sigpipe_handle(int x) { }
+void sigpipe_handle(int x) {
+    std::cerr<<"sigerr\n";
+    eflag=1;
+}
 
-UnixDomainSocketServer::UnixDomainSocketServer():make(&mtx,&buffer){
+UnixDomainSocketServer::UnixDomainSocketServer(){
   UnixDomainSocketServer::socketName_=SOCK_NAME;
-  mtx.lock();
   std::cout << "UnixDomainSocketServer" << std::this_thread::get_id() << std::endl;
-  mtx.unlock();
   unlink(socketName_.c_str());
 }
 
@@ -55,18 +57,18 @@ void UnixDomainSocketServer::create() {
 }
 
 void UnixDomainSocketServer::serve() {
-    int client=0;
+  int client=0;
   try{
     struct sockaddr_in client_addr;
     socklen_t clientlen = sizeof(client_addr);
     while (1) {
-      mtx.lock();
       std::cout << "socket running" << std::endl;
-      mtx.unlock();
       if ((client = accept(server_, (struct sockaddr *)&client_addr, &clientlen)) > 0){
-        while(client!=0){
+        while(client!=0 && eflag==0){
           handle(client);
         }
+        eflag=0;
+        client=0;
       }
     }
     closeSocket(client);
@@ -79,71 +81,60 @@ void UnixDomainSocketServer::serve() {
 
 void UnixDomainSocketServer::handle(int& client) {
   try{
+    std::cout<<"waiting"<<std::endl;
+    MakeRelation make;
     bool success;
-    char req;
+    std::string method;
     int res;
     std::string xml;
+    std::string xml_res;
     if ((getXML(client, xml))!='\0') {
-      switch(req){
-        case 'a':{
-          sendResponse(client, 0);
+      xmlParse xmlparse(xml);
+      xmlCreate xmlcreate;
+      if(xmlparse.XML_header(method)){
+        if(method=="authentication"){
           struct AUTH auth;
           User_ID userid;
-          if(getAuth(client,auth)){
+          if(xmlparse.XML_auth(auth)){
             std::cout<<auth.username<<std::endl;
             if(make.auth_user(auth.username,auth.password,userid)){
               std::cout<<userid<<std::endl;
-              if(sendUserID(client, userid)){
-                recv(client,&res,sizeof(res),0);
-              }
-              else{
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_userid(userid);
+              if(!sendXML(client, xml_res)){
                 std::cout<<"cant send userid\n";
-                break;
               }
             }
             else{
               std::cout<<"authentication fail\n";
-              sendUserID(client, "");
-              break;
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_err();
+              sendXML(client, xml_res);
             }
           }else{
             std::cerr<<"cant get username\n";
-            sendUserID(client, "");
-            break;
+            xmlcreate.Clear();
+            xml_res.clear();
+            xml_res=xmlcreate.create_XML_err();
+            sendXML(client, xml_res);
           }
-          break;
-                 }
-        case 'n':{
-          xmlParse xmlparse;
-          sendResponse(client, 0);
-          std::string xml;
-          if(getXML(client, xml)){
-            Consumer c;
-            xmlparse.XML_node(xml,c);
-            std::cout<<c.getNode_ID()<<std::endl;
-            std::cout<<c.getUser_ID()<<std::endl;
-            std::cout<<c.getPrivacy_lvl()<<std::endl;
-            std::cout<<c.getNode_Type()<<std::endl;
-            std::cout<<c.getData_Type()<<std::endl;
-            std::cout<<c.getinterval()<<std::endl;
+        }
+        else if(method=="register_newnode"){
+          std::cout<<"register_newnode\n";
+          Consumer c;
+          if(xmlparse.XML_node(c)){
             make.make_from_node(c);
-            xmlparse.Clear();
           }
-          break;
-                 }
-        case 's':
-        case 'c':
-        case 'd':
-        case 'q':{
+        }
+        else if(method=="register_newservice"){
+        }
+        else if(method=="quite"){
           closeSocket(client);
-          break;
-                 }
-        default:{
-          break;
-                 }
+        }
       }
-    }else{
-      //closeSocket(client);
+      xmlparse.Clear();
+      xmlcreate.Clear();
     }
   }
   catch(...){
@@ -151,36 +142,6 @@ void UnixDomainSocketServer::handle(int& client) {
     unlink(socketName_.c_str());
   }
 }
-
-//bool UnixDomainSocketServer::getReq(int& client,char &req){
-//  try{
-//    int cc;
-//    if((cc=recv(client, &req, sizeof(req), 0))>0){
-//      return true;
-//    }else{
-//      return false;
-//    }
-//  }
-//  catch(...){
-//    closeSocket(client);
-//    unlink(socketName_.c_str());
-//  }
-//}
-//
-//bool UnixDomainSocketServer::getAuth(int& client, AUTH &auth){
-//  try{
-//    int cc;
-//    if((cc=recv(client, &auth, sizeof(auth), 0))>0){
-//      return true;
-//    }else{
-//      return false;
-//    }
-//  }
-//  catch(...){
-//    closeSocket(client);
-//    unlink(socketName_.c_str());
-//  }
-//}
 
 bool UnixDomainSocketServer::getXML(int& client, std::string &xml){
   try{
@@ -209,10 +170,6 @@ bool UnixDomainSocketServer::getXML(int& client, std::string &xml){
 bool UnixDomainSocketServer::sendResponse(int& client, int res) {
   try{
     int cc;
-    //char sendBuf[16] = "ok";
-    mtx.lock();
-    std::cout<<"will send response"<<std::endl;
-    mtx.unlock();
     if ((cc=send(client, &res, sizeof(res), 0))<0) {
       std::cerr<<"send";
       return false;
@@ -226,34 +183,10 @@ bool UnixDomainSocketServer::sendResponse(int& client, int res) {
   }
 }
 
-bool UnixDomainSocketServer::sendUserID(int& client, User_ID u){
-  try{
-    int cc;
-    mtx.lock();
-    std::cout<<"will send userid"<<std::endl;
-    mtx.unlock();
-    char userid[64]={'\0'};
-    strncpy(userid,u.c_str(),sizeof(userid));
-    if((cc=send(client, &userid, sizeof(userid), 0))<0){
-      std::cerr<<"send";
-      return false;
-    }else{
-      return true;
-    }
-  }
-  catch(...){
-    closeSocket(client);
-    unlink(socketName_.c_str());
-  }
-}
-
 bool UnixDomainSocketServer::sendXML(int& client, std::string& xml){
   try{
     int cc;
     int res;
-    mtx.lock();
-    std::cout<<"will send XML"<<std::endl;
-    mtx.unlock();
     int size=xml.size();
     char tmp[size];
     strncpy(tmp,xml.c_str(),sizeof(tmp));
@@ -262,7 +195,7 @@ bool UnixDomainSocketServer::sendXML(int& client, std::string& xml){
       return false;
     }else{
       if((cc=recv(client, &res, sizeof(res), 0))<0){
-        std::cerr<<"response res";
+        std::cerr<<"response res(1)";
         return false;
       }else{
         if(res==0){
@@ -271,7 +204,7 @@ bool UnixDomainSocketServer::sendXML(int& client, std::string& xml){
             return false;
           }else{
             if((cc=recv(client, &res, sizeof(res), 0))<0){
-              std::cerr<<"response res2";
+              std::cerr<<"response res(2)";
               return false;
             }else{
               if(res!=0){
@@ -299,12 +232,10 @@ void UnixDomainSocketServer::closeSocket(int &client) {
   client=0;
 }
 
-void UnixDomainSocketServer::notifyServer() {
-}
 
 #endif
 int main(){
-  std::signal(SIGPIPE,SIG_IGN);
+  std::signal(SIGPIPE,sigpipe_handle);
   UnixDomainSocketServer server;
   server.run();
   return 0;
