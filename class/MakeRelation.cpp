@@ -33,8 +33,7 @@ bool MakeRelation::make_from_node(Consumer newnode){
       std::cerr<<"err"<<std::endl;
       return false;
     }else{
-      std::cout<<"insert newnode"<<std::endl;
-      if(database.insertValue(newnode)!=0){
+      if(!database.insertValue(newnode)){
         return false;
       }
     }
@@ -47,6 +46,7 @@ bool MakeRelation::make_from_node(Consumer newnode){
      * をマッチングさせている．
      */
     database.selectValue("privacy_lvl >= " + std::to_string(newnode.getPrivacy_lvl()) + " AND data_type = " + database.quote(newnode.getData_Type()) + " AND interval >= " + std::to_string(newnode.getinterval()), match_service);
+    std::cout<<"matching service\n";
 
     std::map<std::string, std::vector<Relation> > m_rv;
     for(sitr=match_service.begin();sitr!=match_service.end();sitr++){
@@ -57,7 +57,8 @@ bool MakeRelation::make_from_node(Consumer newnode){
       tmp.setPrivacy_lvl(sitr->getPrivacy_lvl());
       tmp.setinterval(sitr->getinterval());
       tmp.setlocation(newnode.getlocation());
-      if(database.insertValue(tmp))std::cout<<"exist\n";
+      if(!database.insertValue(tmp))
+        std::cerr<<"exist\n";
       database.selectValue("nodeid = " + database.quote(newnode.getNode_ID()) + " AND serviceid = " + database.quote(sitr->getService_ID()), m_rv[tmp.getlocation()]);
     }
     mySoapClient msclient;
@@ -78,11 +79,13 @@ bool MakeRelation::make_from_service(Vender newservice){
     std::vector<Consumer>::iterator nitr;
     if(newservice.getService_ID().empty()){
       std::cerr<<"err"<<std::endl;
-      throw;
+      return false;
     }else{
-      database.insertValue(newservice);
+      if(!database.insertValue(newservice))
+        return false;
     }
     database.selectValue("privacy_lvl <= " + std::to_string(newservice.getPrivacy_lvl()) + " AND data_type = " + database.quote(newservice.getData_Type()) + " AND interval <= " + std::to_string(newservice.getinterval()), match_node);
+    std::cout<<"matching node\n";
 
     std::map<std::string, std::vector<Relation> > m_rv;
     for(nitr=match_node.begin();nitr!=match_node.end();nitr++){
@@ -93,7 +96,7 @@ bool MakeRelation::make_from_service(Vender newservice){
       tmp.setPrivacy_lvl(newservice.getPrivacy_lvl());
       tmp.setinterval(newservice.getinterval());
       tmp.setlocation(nitr->getlocation());
-      if(database.insertValue(tmp))std::cout<<"exist\n";
+      if(!database.insertValue(tmp))std::cout<<"exist\n";
       database.selectValue("nodeid = " + database.quote(nitr->getNode_ID()) + " AND serviceid = " + database.quote(newservice.getService_ID()), m_rv[tmp.getlocation()]);
     }
     mySoapClient msclient;
@@ -117,6 +120,9 @@ bool MakeRelation::change_privacy_from_node(Node_ID nodeid, Service_ID serviceid
       throw;
     }
     database.updataRelationPrivacy(nodeid,serviceid,req);
+    relation.clear();
+    database.selectValue("serviceid = " + database.quote(serviceid) + " AND nodeid = " + database.quote(nodeid),relation);
+    mySoapClient msclient;
     return true;
   }
   catch(...){

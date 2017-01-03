@@ -126,7 +126,7 @@ void UnixDomainSocketClient::handle(){
         break;
                }
       case 'n':{//here
-        if(!userid.empty()){
+        if(!userid.empty() && userid[0]=='u'){
           Consumer c;
           xmlCreate xmlcreate;
           std::string text;
@@ -157,7 +157,34 @@ void UnixDomainSocketClient::handle(){
           std::cout<<"prease authenticate"<<std::endl;
         }
         break;
+      case 's':{//here
+        if(!userid.empty()){
+          Vender v;
+          xmlCreate xmlcreate;
+          std::string text;
+          int num;
+          std::cout<<"Service_ID:";
+          std::cin>>std::setw(64)>>text;
+          v.setService_ID(text);
+          std::cout<<"Vender_ID:";
+          std::cin>>std::setw(64)>>text;
+          v.setVender_ID(text);
+          std::cout<<"Privacy_lvl:";
+          std::cin>>num;
+          v.setPrivacy_lvl(num);
+          std::cout<<"Data_ID(power, temp, wind, co2):";
+          std::cin>>text;
+          v.setData_Type(text);
+          std::cout<<"interval:";
+          std::cin>>num;
+          v.setinterval(num);
+          send_XML(xmlcreate.create_XML_newservice(v));
+        }else{
+          std::cout<<"prease authenticate"<<std::endl;
+        }
+        break;
                }
+        }
       case 'q':{
         xmlcreate.Clear();
         xml_res.clear();
