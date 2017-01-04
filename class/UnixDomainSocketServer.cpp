@@ -2,6 +2,7 @@
 #define UNIX_DOMAIN_SOCKET_SERVER_CPP
 #include "UnixDomainSocketServer.h"
 #include <csignal>
+#include <unistd.h>
 
 volatile sig_atomic_t eflag=0;
 const std::string SOCK_NAME = "/tmp/unix-socket";
@@ -64,11 +65,12 @@ void UnixDomainSocketServer::serve() {
     while (1) {
       std::cout << "socket running" << std::endl;
       if ((client = accept(server_, (struct sockaddr *)&client_addr, &clientlen)) > 0){
-        while(client!=0 && eflag==0){
-          handle(client);
-        }
-        eflag=0;
-        client=0;
+        //while(client!=0 && eflag==0){
+        //  handle(client);
+        //}
+        //eflag=0;
+        //client=0;
+        handle(client);
       }
     }
     closeSocket(client);
@@ -156,17 +158,21 @@ void UnixDomainSocketServer::handle(int& client) {
 bool UnixDomainSocketServer::getXML(int& client, std::string &xml){
   try{
     int cc;
-    char buffer[16]={'\0'};
+    //char buffer[16]={'\0'};
     int size =0;
-    std::stringstream ss;
-    if((cc=recv(client, &buffer, sizeof(buffer), 0))<0){
+    //std::stringstream ss;
+    if((cc=recv(client, &size, sizeof(size), 0))<0){
       return false;
     }
-    ss<<buffer;
-    ss>>size;
-    ss.clear();
+    //std::cout<<buffer<<std::endl;
+    //ss<<buffer;
+    //ss>>size;
     char tmp[size];
+    //ss.str("");
+    //ss.clear();
     if((cc=recv(client, &tmp, sizeof(tmp), 0))>0){
+      std::cout<<tmp<<std::endl;
+      std::stringstream ss;
       ss<<tmp;
       ss>>xml;
       return true;
@@ -202,21 +208,23 @@ bool UnixDomainSocketServer::sendXML(int& client, std::string& xml){
     int res;
     int size=xml.size();
     char tmp[size];
-    std::stringstream ss;
-    ss<<xml;
-    ss>>tmp;
-    ss.clear();
-    char buffer[16]={'\0'};
-    ss<<size;
-    ss>>buffer;
-    if((cc=send(client, &buffer, sizeof(buffer), 0))<0){
+    strncpy(tmp,xml.c_str(),sizeof(tmp));
+    //std::stringstream ss;
+    //char buffer[4]={'\0'};
+    //std::cout<<size<<std::endl;
+    //ss<<size;
+    //ss>>buffer;
+    //std::cout<<buffer<<std::endl;
+    if((cc=send(client, &size, sizeof(size), 0))<0){
       std::cerr<<"send size";
       return false;
     }else{
-      if((cc=send(client, &tmp, sizeof(tmp), 0))<0){
+      std::cout<<tmp<<std::endl;
+      while((cc=send(client, &tmp, sizeof(tmp), 0))<0){
         std::cerr<<"send tmp";
-        return false;
+        //return false;
       }
+      std::cout<<"send\n";
       return true;
     }
   }
