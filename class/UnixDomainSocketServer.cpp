@@ -136,7 +136,15 @@ void UnixDomainSocketServer::handle(int& client) {
             make.make_from_service(v);
           }
         }
-        else if(method=="change"){
+        else if(method=="privacy"){
+          std::cout<<"change\n";
+          std::string s;
+          std::string n;
+          int p;
+          if(xmlparse.XML_privacy(s,n,p)){
+            std::cout<<s<<n<<p<<std::endl;
+            make.change_privacy_from_node(s,n,p);
+          }
         }
         else if(method=="quite"){
           closeSocket(client);

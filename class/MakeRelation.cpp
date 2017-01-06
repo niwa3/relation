@@ -110,19 +110,19 @@ bool MakeRelation::make_from_service(Vender newservice){
   }
 }
 
-bool MakeRelation::change_privacy_from_node(Node_ID nodeid, Service_ID serviceid, int req, User_ID id){
+bool MakeRelation::change_privacy_from_node(Service_ID serviceid, Node_ID nodeid, int req){
   try{
     DataBase database(dbopt);
     std::vector<Relation> relation;
-    std::vector<Relation>::iterator iitr;
     database.selectValue("serviceid = " + database.quote(serviceid) + " AND nodeid = " + database.quote(nodeid), relation);
+    std::cout<<relation.empty()<<std::endl;
     if(relation.empty()){
       throw;
     }
     database.updataRelationPrivacy(nodeid,serviceid,req);
-    relation.clear();
-    database.selectValue("serviceid = " + database.quote(serviceid) + " AND nodeid = " + database.quote(nodeid),relation);
+    relation.begin()->setPrivacy_lvl(req);
     mySoapClient msclient;
+    msclient.changeRelation(relation.begin()->getlocation(),relation);
     return true;
   }
   catch(...){

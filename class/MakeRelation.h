@@ -19,9 +19,9 @@ class MakeRelation{
     bool auth_user(std::string username, std::string password, std::string &userid);
     bool make_from_node(Consumer);//
     bool make_from_service(Vender);
-    bool change_privacy_from_node(Node_ID, Service_ID, int, User_ID);
+    bool change_privacy_from_node(Node_ID, Service_ID, int);
     //bool change_privacy_from_service(Service_ID, Node_ID, int){};//いるの？
-    bool delete_relation(Node_ID, Service_ID, User_ID);
+    bool delete_relation(Service_ID, Node_ID, User_ID);
     bool auth_user(AUTH);
 
   private:
