@@ -63,7 +63,6 @@ void UnixDomainSocketServer::serve() {
     struct sockaddr_in client_addr;
     socklen_t clientlen = sizeof(client_addr);
     while (1) {
-      std::cout << "socket running" << std::endl;
       if ((client = accept(server_, (struct sockaddr *)&client_addr, &clientlen)) > 0){
         //while(client!=0 && eflag==0){
         //  handle(client);
@@ -83,7 +82,6 @@ void UnixDomainSocketServer::serve() {
 
 void UnixDomainSocketServer::handle(int& client) {
   try{
-    std::cout<<"waiting"<<std::endl;
     MakeRelation make;
     bool success;
     std::string method;
@@ -99,16 +97,14 @@ void UnixDomainSocketServer::handle(int& client) {
           struct AUTH auth;
           User_ID userid;
           if(xmlparse.XML_auth(auth)){
-            std::cout<<auth.username<<auth.password<<std::endl;
             if(make.auth_user(auth.username,auth.password,userid)){
               xml_res.clear();
               xml_res=xmlcreate.create_XML_userid(userid);
               if(!sendXML(client, xml_res)){
-                std::cout<<"cant send userid\n";
+                std::cerr<<"cant send userid\n";
               }
             }
             else{
-              std::cerr<<"authentication fail\n";
               xmlcreate.Clear();
               xml_res.clear();
               xml_res=xmlcreate.create_XML_err();
@@ -123,27 +119,100 @@ void UnixDomainSocketServer::handle(int& client) {
           }
         }
         else if(method=="register_newnode"){
-          std::cout<<"register_newnode\n";
           Consumer c;
+          std::string id;
+          xmlparse.XML_header_id(id);
           if(xmlparse.XML_node(c)){
-            make.make_from_node(c);
+            if(make.make_from_node(c)){
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_ok();
+              sendXML(client, xml_res);
+            }
+            else{
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_err();
+              sendXML(client, xml_res);
+            }
           }
         }
         else if(method=="register_newservice"){
-          std::cout<<"register_newservice\n";
           Vender v;
+          std::string id;
+          xmlparse.XML_header_id(id);
           if(xmlparse.XML_service(v)){
-            make.make_from_service(v);
+            if(make.make_from_service(v)){
+             xmlcreate.Clear();
+             xml_res.clear();
+             xml_res=xmlcreate.create_XML_ok();
+             sendXML(client, xml_res);
+            }
+            else{
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_err();
+              sendXML(client, xml_res);
+            }
           }
         }
         else if(method=="privacy"){
-          std::cout<<"change\n";
           std::string s;
           std::string n;
           int p;
+          std::string id;
+          xmlparse.XML_header_id(id);
           if(xmlparse.XML_privacy(s,n,p)){
-            std::cout<<s<<n<<p<<std::endl;
-            make.change_privacy_from_node(s,n,p);
+            if(make.change_privacy_from_node(s,n,p)){
+             xmlcreate.Clear();
+             xml_res.clear();
+             xml_res=xmlcreate.create_XML_ok();
+             sendXML(client, xml_res);
+            }
+            else{
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_err();
+              sendXML(client, xml_res);
+            }
+          }
+        }
+        else if(method=="delete_node"){
+          std::string n;
+          std::string id;
+          xmlparse.XML_header_id(id);
+          if(xmlparse.XML_delete_node(n)){
+            if(make.delete_node(n)){
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_ok();
+              sendXML(client, xml_res);
+            }
+            else{
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_err();
+              sendXML(client, xml_res);
+            }
+          }
+        }
+        else if(method=="delete_service"){
+          std::string s;
+          std::string id;
+          xmlparse.XML_header_id(id);
+          if(xmlparse.XML_delete_service(s)){
+            if(make.delete_service(s)){
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_ok();
+              sendXML(client, xml_res);
+            }
+            else{
+              xmlcreate.Clear();
+              xml_res.clear();
+              xml_res=xmlcreate.create_XML_err();
+              sendXML(client, xml_res);
+            }
           }
         }
         else if(method=="quite"){
@@ -179,10 +248,8 @@ bool UnixDomainSocketServer::getXML(int& client, std::string &xml){
     //ss.str("");
     //ss.clear();
     if((cc=recv(client, &tmp, sizeof(tmp), 0))>0){
-      std::cout<<tmp<<std::endl;
       std::stringstream ss;
-      ss<<tmp;
-      ss>>xml;
+      xml=tmp;
       return true;
     }else{
       return false;
@@ -227,12 +294,10 @@ bool UnixDomainSocketServer::sendXML(int& client, std::string& xml){
       std::cerr<<"send size";
       return false;
     }else{
-      std::cout<<tmp<<std::endl;
       while((cc=send(client, &tmp, sizeof(tmp), 0))<0){
         std::cerr<<"send tmp";
         //return false;
       }
-      std::cout<<"send\n";
       return true;
     }
   }

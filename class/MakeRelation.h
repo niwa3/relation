@@ -21,8 +21,10 @@ class MakeRelation{
     bool make_from_service(Vender);
     bool change_privacy_from_node(Node_ID, Service_ID, int);
     //bool change_privacy_from_service(Service_ID, Node_ID, int){};//いるの？
-    bool delete_relation(Service_ID, Node_ID, User_ID);
+    bool delete_relation(Service_ID, Node_ID);
     bool auth_user(AUTH);
+    bool delete_node(std::string);
+    bool delete_service(std::string);
 
   private:
     std::string dbopt;
